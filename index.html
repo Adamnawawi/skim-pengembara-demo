@@ -1,0 +1,672 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
+<title>Suara Anda, Skim Kita — PERKESO Johor</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@800;900&family=Inter:wght@400;500;600&display=swap');
+
+  :root{
+    --navy:#0B2F5C;
+    --navy-dark:#071F3D;
+    --green:#1D9E75;
+    --green-dark:#167A5B;
+    --amber:#EF9F27;
+    --red:#D9483A;
+    --paper:#FBFAF7;
+    --ink:#1C2733;
+    --ink-soft:#5B6B7A;
+    --line:#E4E1D8;
+    --radius:18px;
+  }
+
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    font-family:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;
+    background:var(--paper);
+    color:var(--ink);
+    line-height:1.65;
+    -webkit-font-smoothing:antialiased;
+  }
+  h1,h2,h3,.headline{
+    font-family:'Montserrat','Arial Black',sans-serif;
+    font-weight:900;
+    line-height:1.15;
+    letter-spacing:-0.01em;
+    color:var(--navy);
+    margin:0;
+  }
+
+  #app{max-width:520px;margin:0 auto;min-height:100vh;background:var(--paper);position:relative;display:flex;flex-direction:column;}
+
+  .demo-flag{
+    background:var(--navy-dark);color:#fff;font-size:11px;letter-spacing:.04em;
+    text-align:center;padding:6px 10px;font-weight:600;
+  }
+
+  .screen{padding:28px 22px 34px;flex:1;display:flex;flex-direction:column;animation:fadeUp .35s ease both;}
+  @keyframes fadeUp{from{opacity:0;transform:translateY(10px);}to{opacity:1;transform:translateY(0);}}
+
+  /* ---------- HOOK SCREEN ---------- */
+  .hook-screen{
+    background:linear-gradient(180deg,var(--navy) 0%,var(--navy-dark) 100%);
+    color:#fff;min-height:100vh;justify-content:flex-start;
+  }
+  .hook-eyebrow{color:var(--amber);font-weight:800;letter-spacing:.06em;font-size:13px;text-transform:uppercase;margin-bottom:14px;}
+  .hook-headline{font-size:34px;color:#fff;}
+  .hook-headline em{font-style:normal;color:var(--amber);}
+  .hook-sub{color:#CFE0F0;font-size:16px;margin-top:16px;max-width:36ch;}
+  .hook-scene{margin:26px -22px 0;line-height:0;}
+  .hook-scene svg{width:100%;height:auto;display:block;}
+  .hook-footer{margin-top:auto;padding-top:20px;}
+
+  /* ---------- BRIDGE PROGRESS ---------- */
+  .bridge-wrap{margin:0 0 26px;}
+  .bridge-meta{display:flex;justify-content:space-between;font-size:12px;color:var(--ink-soft);margin-bottom:8px;font-weight:600;}
+  .bridge{
+    position:relative;height:54px;border-radius:14px;overflow:hidden;
+    background:linear-gradient(90deg,#0B2F5C 0%,#0B2F5C 12%,#8FB6D9 50%,#0B2F5C 88%,#0B2F5C 100%);
+  }
+  .bridge-sky{position:absolute;inset:0;opacity:.9;
+    background:linear-gradient(180deg, rgba(255,255,255,.12) 0%, rgba(255,255,255,0) 55%);}
+  .bridge-deck{position:absolute;left:0;right:0;bottom:14px;height:3px;background:rgba(255,255,255,.55);}
+  .bridge-cable{position:absolute;bottom:14px;width:1px;background:rgba(255,255,255,.4);}
+  .bridge-tower{position:absolute;bottom:14px;width:3px;background:rgba(255,255,255,.55);}
+  .bridge-city{position:absolute;bottom:14px;font-size:20px;}
+  .bridge-city.jb{left:6px;}
+  .bridge-city.sg{right:6px;}
+  .bridge-track{position:absolute;bottom:16px;left:8%;right:8%;height:2px;}
+  .bridge-icon{
+    position:absolute;bottom:18px;font-size:22px;transform:translateX(-50%);
+    transition:left .5s cubic-bezier(.4,0,.2,1);filter:drop-shadow(0 2px 3px rgba(0,0,0,.35));
+  }
+
+  /* ---------- CARD / FORM ---------- */
+  .card{background:#fff;border:1px solid var(--line);border-radius:var(--radius);padding:22px;box-shadow:0 2px 10px rgba(11,47,92,.05);}
+  .field{margin-bottom:16px;}
+  .field label{display:block;font-size:13px;font-weight:600;color:var(--navy);margin-bottom:6px;}
+  .field input, .field select{
+    width:100%;padding:13px 14px;border:1.5px solid var(--line);border-radius:12px;
+    font-size:16px;font-family:inherit;color:var(--ink);background:#fff;
+    appearance:none;-webkit-appearance:none;
+  }
+  .field select{
+    background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='14' height='8' viewBox='0 0 14 8'><path d='M1 1l6 6 6-6' stroke='%235B6B7A' stroke-width='2' fill='none' fill-rule='evenodd'/></svg>");
+    background-repeat:no-repeat;background-position:right 14px center;padding-right:36px;
+  }
+  .field input:focus, .field select:focus{outline:none;border-color:var(--green);}
+  .field-hint{font-size:12px;color:var(--ink-soft);margin-top:5px;}
+
+  .q-block{transition:opacity .22s ease, transform .22s ease;}
+  .q-block.q-fade{opacity:0;transform:translateY(10px);}
+
+  .q-scene{width:100%;height:84px;margin:0 0 16px;border-radius:16px;overflow:hidden;}
+  .q-scene svg{width:100%;height:100%;display:block;}
+  .q-scene-commute{background:linear-gradient(180deg,#E4F1FC,#FFFFFF);}
+  .q-scene-financial{background:linear-gradient(180deg,#E7F5EF,#FFFFFF);}
+  .q-scene-rights{background:linear-gradient(180deg,#FCEFDC,#FFFFFF);}
+  .q-scene-profile{background:linear-gradient(180deg,#EDEFF7,#FFFFFF);}
+
+  .pillar-tag{
+    display:inline-block;font-size:11px;font-weight:700;letter-spacing:.03em;text-transform:uppercase;
+    color:var(--green-dark);background:#E7F5EF;padding:5px 10px;border-radius:999px;margin-bottom:14px;
+  }
+  .question-text{font-size:21px;font-weight:800;font-family:'Montserrat',sans-serif;color:var(--navy);margin-bottom:22px;}
+
+  .option-btn{
+    display:flex;align-items:center;justify-content:space-between;width:100%;text-align:left;
+    padding:16px 18px;margin-bottom:12px;border:1.5px solid var(--line);border-radius:14px;
+    background:#fff;font-size:16px;font-weight:600;color:var(--ink);cursor:pointer;
+    transition:border-color .15s, background .15s, transform .1s;font-family:inherit;
+  }
+  .option-btn:active{transform:scale(.99);}
+  .option-btn:hover{border-color:var(--green);}
+  .option-btn.selected{border-color:var(--green);background:#F1FAF6;color:var(--green-dark);}
+  .option-check{width:20px;height:20px;border-radius:50%;border:2px solid var(--line);flex-shrink:0;}
+  .option-btn.selected .option-check{border-color:var(--green);background:var(--green);}
+
+  .nav-row{display:flex;gap:10px;margin-top:auto;padding-top:22px;}
+  .btn{
+    flex:1;padding:15px 20px;border-radius:14px;border:none;font-size:16px;font-weight:700;
+    font-family:inherit;cursor:pointer;transition:filter .15s, transform .1s;
+  }
+  .btn:active{transform:scale(.98);}
+  .btn-primary{background:var(--amber);color:var(--navy-dark);}
+  .btn-primary:hover{filter:brightness(1.05);}
+  .btn-primary:disabled{background:#EFE9DA;color:#A9A296;cursor:not-allowed;}
+  .btn-ghost{background:transparent;color:var(--ink-soft);border:1.5px solid var(--line);flex:0 0 auto;padding-left:18px;padding-right:18px;}
+  .btn-block{width:100%;}
+
+  /* ---------- RESULT SCREEN ---------- */
+  .result-hero{text-align:center;padding:6px 0 22px;}
+  .result-hero .headline{font-size:24px;}
+  .result-hero p{color:var(--ink-soft);margin-top:8px;font-size:15px;}
+
+  .pillar-row{margin-bottom:20px;}
+  .pillar-row-top{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:8px;}
+  .pillar-row-top .name{font-weight:700;font-size:14.5px;color:var(--navy);}
+  .pillar-row-top .pct{font-weight:800;font-size:14.5px;}
+  .gap-track{height:12px;border-radius:999px;background:#EDEAE1;overflow:hidden;}
+  .gap-fill{height:100%;border-radius:999px;transition:width .7s ease;}
+  .gap-fill.ok{background:var(--green);}
+  .gap-fill.warn{background:var(--amber);}
+  .gap-fill.danger{background:var(--red);}
+  .pct.ok{color:var(--green-dark);}
+  .pct.warn{color:#B87313;}
+  .pct.danger{color:var(--red);}
+
+  .callout{
+    background:var(--navy);color:#fff;border-radius:16px;padding:20px;margin:22px 0;
+  }
+  .callout .tag{color:var(--amber);font-weight:800;font-size:12px;text-transform:uppercase;letter-spacing:.05em;margin-bottom:8px;display:block;}
+  .callout p{margin:0;font-size:15px;color:#EAF1FA;}
+
+  .confirm-screen{align-items:center;text-align:center;justify-content:center;min-height:100vh;}
+  .confirm-icon{font-size:52px;margin-bottom:18px;}
+  .confirm-screen p{color:var(--ink-soft);max-width:34ch;margin:10px auto 0;}
+
+  .footer-note{font-size:11px;color:#A6ADB4;text-align:center;padding:14px 0 4px;}
+</style>
+</head>
+<body>
+<div id="app" x-data="quizApp()" x-init="init()">
+
+  <div class="demo-flag">DEMO STATIK — TIADA DATA DIHANTAR ATAU DISIMPAN</div>
+
+  <!-- ================= HOOK SCREEN ================= -->
+  <template x-if="screen === 'hook'">
+    <div class="screen hook-screen">
+      <div>
+        <div class="hook-eyebrow">Suara Anda, Skim Kita</div>
+        <h1 class="hook-headline">Kerja Singapura. Tapi... kalau <em>kecemasan</em>, siapa tanggung?</h1>
+        <p class="hook-sub">Setiap hari anda seberang Tambak untuk cari rezeki. PERKESO Johor nak dengar — di mana jurang perlindungan anda, dan macam mana kami boleh bantu.</p>
+      </div>
+      <div class="hook-scene">
+        <svg viewBox="0 0 520 220" preserveAspectRatio="xMidYMax slice" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Ilustrasi Tambak menghubungkan Johor dan Singapura, dengan trafik pagi">
+          <defs>
+            <radialGradient id="sunGlow" cx="50%" cy="100%" r="65%">
+              <stop offset="0%" stop-color="#EF9F27" stop-opacity="0.5"/>
+              <stop offset="100%" stop-color="#EF9F27" stop-opacity="0"/>
+            </radialGradient>
+            <linearGradient id="waterGrad" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stop-color="#123B6E"/>
+              <stop offset="100%" stop-color="#071F3D"/>
+            </linearGradient>
+          </defs>
+
+          <rect x="0" y="0" width="520" height="220" fill="url(#sunGlow)"/>
+
+          <rect x="0" y="168" width="520" height="52" fill="url(#waterGrad)"/>
+          <rect x="0" y="169" width="520" height="2" fill="#EF9F27" opacity="0.4"/>
+          <rect x="0" y="180" width="520" height="1.5" fill="#EF9F27" opacity="0.22"/>
+          <rect x="0" y="193" width="520" height="1.5" fill="#EF9F27" opacity="0.15"/>
+
+          <g fill="#0B2F5C">
+            <rect x="0" y="120" width="18" height="50"/>
+            <rect x="20" y="140" width="16" height="30"/>
+            <rect x="38" y="110" width="20" height="60"/>
+            <rect x="60" y="150" width="14" height="20"/>
+            <circle cx="88" cy="150" r="13"/>
+            <rect x="84" y="128" width="8" height="24"/>
+            <rect x="86" y="118" width="4" height="12"/>
+          </g>
+
+          <g fill="#0B2F5C">
+            <rect x="430" y="145" width="14" height="25"/>
+            <rect x="446" y="120" width="18" height="50"/>
+            <rect x="466" y="100" width="16" height="70"/>
+            <rect x="484" y="130" width="14" height="40"/>
+            <rect x="500" y="60" width="10" height="110"/>
+            <rect x="503" y="50" width="4" height="12"/>
+          </g>
+
+          <path d="M60 158 Q260 148 460 158" stroke="#0B2F5C" stroke-width="10" fill="none" stroke-linecap="round"/>
+          <path d="M60 158 Q260 148 460 158" stroke="#EF9F27" stroke-width="1.5" stroke-dasharray="6 6" fill="none" opacity="0.7"/>
+
+          <g stroke="#0B2F5C" stroke-width="2">
+            <line x1="110" y1="156" x2="110" y2="168"/>
+            <line x1="180" y1="151" x2="180" y2="168"/>
+            <line x1="260" y1="149" x2="260" y2="168"/>
+            <line x1="340" y1="151" x2="340" y2="168"/>
+            <line x1="410" y1="156" x2="410" y2="168"/>
+          </g>
+
+          <g>
+            <rect x="90" y="150" width="10" height="6" rx="1.5" fill="#EF9F27"/>
+            <rect x="105" y="149" width="8" height="5" rx="1.5" fill="#fff"/>
+            <rect x="118" y="150" width="10" height="6" rx="1.5" fill="#EF9F27"/>
+            <rect x="150" y="147" width="12" height="6" rx="1.5" fill="#fff"/>
+            <rect x="170" y="148" width="8" height="5" rx="1.5" fill="#EF9F27"/>
+            <rect x="210" y="145" width="10" height="6" rx="1.5" fill="#EF9F27"/>
+            <rect x="230" y="145" width="8" height="5" rx="1.5" fill="#fff"/>
+            <rect x="270" y="145" width="12" height="6" rx="1.5" fill="#fff"/>
+            <rect x="300" y="146" width="8" height="5" rx="1.5" fill="#EF9F27"/>
+            <rect x="330" y="148" width="10" height="6" rx="1.5" fill="#EF9F27"/>
+            <rect x="360" y="150" width="8" height="5" rx="1.5" fill="#fff"/>
+            <rect x="390" y="151" width="10" height="6" rx="1.5" fill="#EF9F27"/>
+          </g>
+        </svg>
+      </div>
+      <div class="hook-footer">
+        <button class="btn btn-primary btn-block" @click="screen='info'">Mula Kuiz 2 Minit</button>
+        <p style="color:#9FB3C8;font-size:12px;text-align:center;margin-top:12px;">Sesi Libat Urus PERKESO Johor · 18 Oktober 2026</p>
+      </div>
+    </div>
+  </template>
+
+  <!-- ================= INFO CAPTURE ================= -->
+  <template x-if="screen === 'info'">
+    <div class="screen">
+      <div class="bridge-wrap" x-html="bridgeHtml(1, totalSteps)"></div>
+      <h2 style="font-size:22px;margin-bottom:6px;">Sikit je maklumat asas anda</h2>
+      <p style="color:var(--ink-soft);font-size:14px;margin:0 0 20px;">Kami guna maklumat ini untuk daftarkan anda ke sesi 18 Oktober atau hantar ringkasan hasil kuiz. Tiada tujuan pemasaran lain.</p>
+      <div class="card">
+        <div class="field">
+          <label>Nama / Nama Panggilan</label>
+          <input type="text" x-model="info.nama" placeholder="Nama anda">
+        </div>
+        <div class="field">
+          <label>Nombor WhatsApp</label>
+          <input type="tel" x-model="info.whatsapp" placeholder="01X-XXX XXXX">
+          <div class="field-hint">Untuk hantar ringkasan skor anda.</div>
+        </div>
+        <div class="field">
+          <label>Kawasan Tempat Tinggal di Johor</label>
+          <select x-model="info.kawasan">
+            <option value="" disabled selected>Pilih kawasan</option>
+            <option value="JB">Johor Bahru</option>
+            <option value="Kulai">Kulai</option>
+            <option value="Iskandar Puteri">Iskandar Puteri</option>
+            <option value="Pasir Gudang">Pasir Gudang</option>
+            <option value="Lain-lain">Lain-lain</option>
+          </select>
+          <div class="field-hint">Data ini disimulasikan sahaja dalam demo ini — tidak dihantar ke mana-mana pelayan.</div>
+        </div>
+      </div>
+      <div class="nav-row">
+        <button class="btn btn-primary btn-block" :disabled="!infoValid" @click="goToQuiz()">Teruskan</button>
+      </div>
+    </div>
+  </template>
+
+  <!-- ================= SCORED QUESTIONS ================= -->
+  <template x-if="screen === 'quiz'">
+    <div class="screen">
+      <div class="bridge-wrap" x-html="bridgeHtml(quizIndex + 2, totalSteps)"></div>
+      <div class="q-block" :class="{'q-fade': transitioning}">
+        <div class="q-scene" :class="'q-scene-' + currentQuestion.pillar" x-html="pillarSceneHtml(currentQuestion.pillar)"></div>
+        <span class="pillar-tag" x-text="currentQuestion.pillarLabel"></span>
+        <div class="question-text" x-text="currentQuestion.text"></div>
+        <div>
+          <template x-for="opt in scoreOptions" :key="opt.value">
+            <button class="option-btn" :class="{selected: answers[currentQuestion.id] === opt.value}" @click="selectQuizAnswer(opt.value)">
+              <span x-text="opt.label"></span>
+              <span class="option-check"></span>
+            </button>
+          </template>
+        </div>
+        <div class="nav-row">
+          <button class="btn btn-ghost" @click="prevQuizStep()">Kembali</button>
+        </div>
+      </div>
+    </div>
+  </template>
+
+  <!-- ================= PROFILE QUESTIONS ================= -->
+  <template x-if="screen === 'profile'">
+    <div class="screen">
+      <div class="bridge-wrap" x-html="bridgeHtml(profileIndex + scoredQuestions.length + 2, totalSteps)"></div>
+      <div class="q-block" :class="{'q-fade': transitioning}">
+        <div class="q-scene q-scene-profile" x-html="profileSceneHtml()"></div>
+        <span class="pillar-tag" style="background:#FCEFDC;color:#9A5B0E;">Sikit lagi</span>
+        <div class="question-text" x-text="currentProfileQ.text"></div>
+        <div>
+          <template x-for="opt in currentProfileQ.options" :key="opt.value">
+            <button class="option-btn" :class="{selected: profile[currentProfileQ.id] === opt.value}" @click="selectProfileAnswer(opt.value)">
+              <span x-text="opt.label"></span>
+              <span class="option-check"></span>
+            </button>
+          </template>
+        </div>
+        <div class="nav-row">
+          <button class="btn btn-ghost" @click="prevProfileStep()">Kembali</button>
+        </div>
+      </div>
+    </div>
+  </template>
+
+  <!-- ================= RESULT SCREEN ================= -->
+  <template x-if="screen === 'result'">
+    <div class="screen">
+      <div class="result-hero">
+        <span class="hook-eyebrow" style="color:var(--green-dark);">Keputusan Anda</span>
+        <h2 class="headline">Ini gambaran jurang perlindungan anda, <span x-text="info.nama || 'sahabat'"></span></h2>
+        <p>Tiada jawapan yang "salah" — ini hanya untuk bantu kami dengar keperluan sebenar anda.</p>
+      </div>
+
+      <template x-for="p in pillarResults" :key="p.key">
+        <div class="pillar-row">
+          <div class="pillar-row-top">
+            <span class="name" x-text="p.label"></span>
+            <span class="pct" :class="p.level" x-text="Math.round(p.pct) + '% jurang'"></span>
+          </div>
+          <div class="gap-track">
+            <div class="gap-fill" :class="p.level" :style="'width:' + p.pct + '%'"></div>
+          </div>
+        </div>
+      </template>
+
+      <div class="callout">
+        <span class="tag">Jurang terbesar anda</span>
+        <p x-text="weakestPillar.message"></p>
+      </div>
+
+      <div class="nav-row" style="padding-top:0;">
+        <button class="btn btn-primary btn-block" @click="screen='confirm'" x-text="ctaLabel"></button>
+      </div>
+    </div>
+  </template>
+
+  <!-- ================= CONFIRMATION ================= -->
+  <template x-if="screen === 'confirm'">
+    <div class="screen confirm-screen">
+      <div class="confirm-icon" x-text="profile.hadir === 'pagi' ? '🎟️' : '📩'"></div>
+      <h2 class="headline" x-text="profile.hadir === 'pagi' ? 'Pendaftaran anda diterima!' : 'Ringkasan sedang disediakan!'"></h2>
+      <p x-show="profile.hadir === 'pagi'">Terima kasih, <span x-text="info.nama"></span>. Tempat anda untuk Sesi Pagi (9.00 pagi – 1.00 tengah hari) pada 18 Oktober 2026 di Johor telah direkodkan — kemasukan percuma, sarapan, makan tengah hari & cenderahati disediakan. Kami akan hubungi anda melalui WhatsApp untuk butiran lanjut.</p>
+      <p x-show="profile.hadir !== 'pagi'">Terima kasih, <span x-text="info.nama"></span>. Ringkasan hasil kuiz dan maklumat skim akan dihantar ke WhatsApp/emel anda tidak lama lagi.</p>
+      <p style="margin-top:20px;font-size:12px;color:#A6ADB4;">(Demo — tiada mesej sebenar dihantar)</p>
+    </div>
+  </template>
+
+  <div class="footer-note" x-show="screen !== 'hook' && screen !== 'confirm'">PERKESO Johor · Suara Anda, Skim Kita · Demo dalaman</div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/alpinejs@3.14.1/dist/cdn.min.js" defer></script>
+<script>
+function quizApp(){
+  return {
+    screen: 'hook',
+    ref: null,
+    utm_source: null,
+
+    info: { nama:'', whatsapp:'', kawasan:'' },
+    quizIndex: 0,
+    profileIndex: 0,
+    answers: {},
+    profile: {},
+
+    scoreOptions: [
+      { label:'Ya', value:0 },
+      { label:'Kurang pasti', value:0.5 },
+      { label:'Tidak', value:1 },
+    ],
+
+    scoredQuestions: [
+      { id:'c1', pillar:'commute', pillarLabel:'Rutin & Kesejahteraan Perjalanan', text:'Perjalanan Harian: Adakah anda mempunyai perancangan masa dan mod perjalanan yang selesa untuk berulang-alik merentas Tambak/Linkedua setiap minggu?' },
+      { id:'c2', pillar:'commute', pillarLabel:'Rutin & Kesejahteraan Perjalanan', text:'Kecemasan Jalan Raya: Jika kenderaan atau pengangkutan anda terkandas di laluan sempadan, adakah anda mempunyai jaringan bantuan segera yang boleh dipercayai di Johor?' },
+      { id:'c3', pillar:'commute', pillarLabel:'Rutin & Kesejahteraan Perjalanan', text:'Rehat & Pemulihan: Jika anda memerlukan rehat perubatan di Malaysia (contoh: MC beberapa minggu), adakah pendapatan bulanan anda kekal tidak terjejas di Singapura?' },
+      { id:'f1', pillar:'financial', pillarLabel:'Kestabilan Simpanan & Keluarga di Tanah Air', text:'Penyambung Nafkah: Adakah hasil titik peluh anda di Singapura kini menjadi tunjang utama untuk perbelanjaan keluarga (anak, pasangan, atau ibu bapa) di Malaysia?' },
+      { id:'f2', pillar:'financial', pillarLabel:'Kestabilan Simpanan & Keluarga di Tanah Air', text:'Jaringan Keselamatan Malaysia: Selain simpanan bank biasa, adakah anda mempunyai sebarang tabung atau dana kebajikan rasmi di Malaysia yang bertindak sebagai "payung kecemasan"?' },
+      { id:'f3', pillar:'financial', pillarLabel:'Kestabilan Simpanan & Keluarga di Tanah Air', text:'Kesinambungan Sara Hidup: Sekiranya berlaku musibah atau kecederaan di luar jangka, adakah anda mempunyai jaringan sokongan rasmi di tanah air yang mampu menyediakan rawatan pemulihan fizikal berterusan serta bantuan sara hidup berkala untuk keluarga anda?' },
+      { id:'r1', pillar:'rights', pillarLabel:'Hak & Suara Pekerja Luar Negara', text:'Pampasan Adil: Adakah anda tahu hak kebajikan dan pampasan yang sepatutnya anda terima sekiranya berlaku sebarang kesulitan semasa waktu bertugas?' },
+      { id:'r2', pillar:'rights', pillarLabel:'Hak & Suara Pekerja Luar Negara', text:'Kemudahan di Tanah Air: Adakah anda berminat jika Malaysia menyediakan pusat sokongan atau rawatan khas yang mudah diakses untuk pekerja rentas sempadan di Johor?' },
+      { id:'r3', pillar:'rights', pillarLabel:'Hak & Suara Pekerja Luar Negara', text:'Masa Depan Sektor: Adakah anda bersetuju bahawa pekerja Malaysia di Singapura wajar mempunyai skim kebajikan rasmi bertaraf antarabangsa yang diiktiraf kerajaan?' },
+      { id:'r4', pillar:'rights', pillarLabel:'Hak & Suara Pekerja Luar Negara', text:'Peluang Bersuara: Adakah anda ingin pandangan dan pengalaman sebenar anda diambil kira dalam penggubalan dasar bantuan untuk pekerja seperti anda?' },
+    ],
+
+    profileQuestions: [
+      { id:'tempoh', text:'Berapa lama anda telah bekerja di Singapura?', options:[
+        {label:'Kurang 1 tahun (Masih menyesuaikan diri)', value:'<1'},
+        {label:'1 – 5 tahun (Stabil)', value:'1-5'},
+        {label:'Lebih 5 tahun (Berpengalaman luas)', value:'>5'} ] },
+      { id:'moda', text:'Mod utama perjalanan anda:', options:[
+        {label:'Motosikal', value:'motosikal'},
+        {label:'Bas Awam / Bas Kilang', value:'bas'},
+        {label:'Kereta Sendiri / Kereta Sewa', value:'kereta'},
+        {label:'Berjalan kaki / Kereta api (RTS/KTM)', value:'jalan_rts'} ] },
+      { id:'impian', text:'Apakah impian/keutamaan terbesar anda dalam masa 3 tahun akan datang?', options:[
+        {label:'Membina aset/rumah di Johor dengan tenang', value:'aset_rumah'},
+        {label:'Memastikan masa depan pendidikan anak-anak terjamin', value:'pendidikan_anak'},
+        {label:'Mengumpul modal untuk berniaga di tanah air', value:'modal_perniagaan'},
+        {label:'Mendapat jaminan kebajikan setaraf pekerja di Malaysia', value:'jaminan_kebajikan'} ] },
+      { id:'topik', text:'Apakah topik yang paling bermanfaat untuk anda bincangkan bersama pihak berwajib?', options:[
+        {label:'Kemudahan rawatan perubatan & klinik panel di Johor', value:'rawatan_perubatan'},
+        {label:'Skim bantuan kewangan kecemasan jika hilang punca pendapatan', value:'bantuan_kewangan'},
+        {label:'Pelan persaraan dan simpanan masa depan', value:'persaraan_simpanan'},
+        {label:'Isu pasport, permit, dan kelancaran sempadan', value:'pasport_permit'} ] },
+      { id:'hadir', text:'Pilihan Kehadiran Sesi Libat Urus Khas (Ahad, 18 Oktober 2026):', options:[
+        {label:'Hadir Sesi Pagi (9.00 pagi – 1.00 tengah hari) — Kemasukan Percuma, Sarapan, Makan Tengah Hari & Cenderahati Disediakan', value:'pagi'},
+        {label:'Tidak dapat hadir secara fizikal, tetapi ingin menerima ringkasan melalui WhatsApp/E-mel', value:'jauh'} ] },
+    ],
+
+    pillarMessages: {
+      commute: 'Rutin perjalanan anda merentas Tambak/Linkedua nampaknya membawa risiko yang belum sepenuhnya tertangani — dari kecemasan jalan raya hinggalah tekanan pendapatan semasa tempoh rehat perubatan.',
+      financial: 'Kestabilan simpanan dan jaringan keselamatan keluarga anda di tanah air berkemungkinan belum mencukupi sekiranya berlaku musibah atau kehilangan pendapatan secara tiba-tiba.',
+      rights: 'Anda mungkin belum pasti tentang hak kebajikan dan pampasan anda, atau rasa suara anda belum diambil kira dalam dasar sokongan pekerja rentas sempadan.',
+    },
+    pillarLabels: {
+      commute: 'Rutin & Kesejahteraan Perjalanan',
+      financial: 'Kestabilan Simpanan & Keluarga',
+      rights: 'Hak & Suara Pekerja Luar Negara',
+    },
+    topikLabels: {
+      rawatan_perubatan: 'kemudahan rawatan perubatan & klinik panel di Johor',
+      bantuan_kewangan: 'skim bantuan kewangan kecemasan jika hilang punca pendapatan',
+      persaraan_simpanan: 'pelan persaraan dan simpanan masa depan',
+      pasport_permit: 'isu pasport, permit, dan kelancaran sempadan',
+    },
+
+    pillarResults: [],
+    weakestPillar: { key:'commute', message:'' },
+
+    init(){
+      const params = new URLSearchParams(window.location.search);
+      this.ref = params.get('ref');
+      this.utm_source = params.get('utm_source');
+    },
+
+    get totalSteps(){ return 1 + this.scoredQuestions.length + this.profileQuestions.length; },
+    get infoValid(){ return this.info.nama.trim().length > 0 && this.info.whatsapp.trim().length > 0 && this.info.kawasan.trim().length > 0; },
+    get currentQuestion(){ return this.scoredQuestions[this.quizIndex]; },
+    get currentProfileQ(){ return this.profileQuestions[this.profileIndex]; },
+    get ctaLabel(){ return this.profile.hadir === 'pagi' ? 'Daftar Sesi Pagi 18 Oktober 2026' : 'Hantar Ringkasan ke WhatsApp/Emel Saya'; },
+
+    bridgeHtml(step, total){
+      const pct = Math.min(100, Math.max(0, (step/total)*100));
+      const leftPct = 8 + (pct/100)*84;
+      return `
+        <div class="bridge-meta"><span>Johor</span><span>Langkah ${step} / ${total}</span><span>Singapura</span></div>
+        <div class="bridge">
+          <div class="bridge-sky"></div>
+          <div class="bridge-city jb">🏍️🏠</div>
+          <div class="bridge-city sg">🏙️🦁</div>
+          <div class="bridge-deck"></div>
+          <div class="bridge-icon" style="left:${leftPct}%;">🏍️</div>
+        </div>`;
+    },
+
+    pillarSceneHtml(pillar){
+      if(pillar === 'commute'){
+        return `
+        <svg viewBox="0 0 480 140" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Ilustrasi jambatan dan trafik perjalanan harian">
+          <circle cx="400" cy="115" r="26" fill="#EF9F27" opacity="0.35"/>
+          <rect x="0" y="108" width="480" height="32" fill="#0B2F5C" opacity="0.08"/>
+          <g fill="#0B2F5C" opacity="0.85">
+            <rect x="10" y="80" width="14" height="30"/>
+            <rect x="28" y="65" width="16" height="45"/>
+            <rect x="48" y="90" width="12" height="20"/>
+          </g>
+          <g fill="#0B2F5C" opacity="0.85">
+            <rect x="410" y="70" width="14" height="40"/>
+            <rect x="428" y="50" width="12" height="60"/>
+            <rect x="444" y="82" width="14" height="28"/>
+          </g>
+          <path d="M60 96 Q240 84 420 96" stroke="#0B2F5C" stroke-width="7" fill="none" stroke-linecap="round"/>
+          <path d="M60 96 Q240 84 420 96" stroke="#EF9F27" stroke-width="1.2" stroke-dasharray="5 5" fill="none" opacity="0.7"/>
+          <g fill="#EF9F27">
+            <rect x="100" y="90" width="8" height="5" rx="1.2"/>
+            <rect x="130" y="87" width="8" height="5" rx="1.2"/>
+            <rect x="270" y="85" width="8" height="5" rx="1.2"/>
+            <rect x="370" y="92" width="8" height="5" rx="1.2"/>
+          </g>
+          <g fill="#fff" stroke="#0B2F5C" stroke-width="0.6">
+            <rect x="230" y="84" width="8" height="5" rx="1.2"/>
+            <rect x="330" y="88" width="8" height="5" rx="1.2"/>
+          </g>
+        </svg>`;
+      }
+      if(pillar === 'financial'){
+        return `
+        <svg viewBox="0 0 480 140" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Ilustrasi rumah, keluarga dan perlindungan kewangan">
+          <g fill="#0B2F5C">
+            <polygon points="90,55 60,80 120,80"/>
+            <rect x="68" y="80" width="44" height="35"/>
+          </g>
+          <rect x="84" y="95" width="14" height="20" fill="#FFFFFF"/>
+          <path d="M90 28 L109 37 L109 55 Q90 69 71 55 L71 37 Z" fill="none" stroke="#1D9E75" stroke-width="4"/>
+          <path d="M81 47 l6 6 13 -15" stroke="#1D9E75" stroke-width="3.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+          <g fill="#0B2F5C">
+            <circle cx="152" cy="90" r="8"/>
+            <rect x="145" y="98" width="14" height="20" rx="4"/>
+            <circle cx="174" cy="97" r="6"/>
+            <rect x="168" y="103" width="12" height="16" rx="4"/>
+          </g>
+          <g fill="#EF9F27">
+            <ellipse cx="400" cy="112" rx="26" ry="7"/>
+            <ellipse cx="400" cy="103" rx="26" ry="7"/>
+            <ellipse cx="400" cy="94" rx="26" ry="7"/>
+          </g>
+          <text x="400" y="98" font-size="11" fill="#0B2F5C" text-anchor="middle" font-weight="700" font-family="Arial, sans-serif">RM</text>
+        </svg>`;
+      }
+      return `
+        <svg viewBox="0 0 480 140" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Ilustrasi suara dan hak pekerja">
+          <g fill="#0B2F5C">
+            <path d="M60 90 L110 70 L110 110 L60 100 Z"/>
+            <rect x="45" y="88" width="16" height="14" rx="3"/>
+            <rect x="108" y="75" width="10" height="30" rx="3" fill="#EF9F27"/>
+          </g>
+          <g stroke="#EF9F27" stroke-width="3" fill="none" stroke-linecap="round">
+            <path d="M128 78 q10 12 0 24"/>
+            <path d="M138 72 q18 20 0 40"/>
+          </g>
+          <g>
+            <rect x="220" y="50" width="90" height="50" rx="14" fill="#FFFFFF" stroke="#0B2F5C" stroke-width="3"/>
+            <polygon points="240,100 240,115 258,100" fill="#FFFFFF" stroke="#0B2F5C" stroke-width="3"/>
+            <path d="M245 75 l12 12 24 -24" stroke="#1D9E75" stroke-width="5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+          </g>
+          <g fill="#0B2F5C">
+            <rect x="400" y="70" width="10" height="35" rx="4"/>
+            <rect x="412" y="65" width="10" height="40" rx="4"/>
+            <rect x="424" y="70" width="10" height="35" rx="4"/>
+            <rect x="392" y="95" width="46" height="18" rx="8"/>
+          </g>
+        </svg>`;
+    },
+
+    profileSceneHtml(){
+      return `
+        <svg viewBox="0 0 480 140" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Ilustrasi laluan peribadi dan sesi 18 Oktober">
+          <path d="M40 100 Q140 40 240 90 T430 60" stroke="#0B2F5C" stroke-width="2.5" stroke-dasharray="6 8" fill="none" opacity="0.55"/>
+          <circle cx="40" cy="100" r="7" fill="#1D9E75"/>
+          <g fill="#0B2F5C">
+            <path d="M240 60 c-14 0 -24 10 -24 24 c0 18 24 40 24 40 s24 -22 24 -40 c0 -14 -10 -24 -24 -24z"/>
+            <circle cx="240" cy="84" r="9" fill="#FFFFFF"/>
+          </g>
+          <g>
+            <rect x="360" y="55" width="70" height="60" rx="8" fill="#FFFFFF" stroke="#0B2F5C" stroke-width="3"/>
+            <rect x="360" y="55" width="70" height="16" rx="8" fill="#EF9F27"/>
+            <text x="395" y="97" font-size="22" font-weight="800" fill="#0B2F5C" text-anchor="middle" font-family="Arial, sans-serif">18</text>
+            <line x1="374" y1="48" x2="374" y2="60" stroke="#0B2F5C" stroke-width="3" stroke-linecap="round"/>
+            <line x1="416" y1="48" x2="416" y2="60" stroke="#0B2F5C" stroke-width="3" stroke-linecap="round"/>
+          </g>
+        </svg>`;
+    },
+
+    goToQuiz(){ this.screen = 'quiz'; this.quizIndex = 0; },
+
+    advancing: false,
+    transitioning: false,
+
+    transitionTo(fn){
+      this.transitioning = true;
+      setTimeout(() => {
+        fn();
+        this.transitioning = false;
+        setTimeout(() => { this.advancing = false; }, 220);
+      }, 220);
+    },
+
+    selectQuizAnswer(value){
+      if(this.advancing) return;
+      this.answers[this.currentQuestion.id] = value;
+      this.advancing = true;
+      setTimeout(() => this.transitionTo(() => this.nextQuizStep()), 300);
+    },
+    selectProfileAnswer(value){
+      if(this.advancing) return;
+      this.profile[this.currentProfileQ.id] = value;
+      this.advancing = true;
+      setTimeout(() => this.transitionTo(() => this.nextProfileStep()), 300);
+    },
+
+    nextQuizStep(){
+      if(this.quizIndex < this.scoredQuestions.length - 1){
+        this.quizIndex++;
+      } else {
+        this.screen = 'profile';
+        this.profileIndex = 0;
+      }
+    },
+    prevQuizStep(){
+      if(this.advancing) return;
+      this.advancing = true;
+      this.transitionTo(() => {
+        if(this.quizIndex > 0){ this.quizIndex--; }
+        else { this.screen = 'info'; }
+      });
+    },
+
+    nextProfileStep(){
+      if(this.profileIndex < this.profileQuestions.length - 1){
+        this.profileIndex++;
+      } else {
+        this.computeResults();
+        this.screen = 'result';
+      }
+    },
+    prevProfileStep(){
+      if(this.advancing) return;
+      this.advancing = true;
+      this.transitionTo(() => {
+        if(this.profileIndex > 0){ this.profileIndex--; }
+        else { this.screen = 'quiz'; this.quizIndex = this.scoredQuestions.length - 1; }
+      });
+    },
+
+    computeResults(){
+      const pillars = ['commute','financial','rights'];
+      this.pillarResults = pillars.map(key => {
+        const qs = this.scoredQuestions.filter(q => q.pillar === key);
+        const sum = qs.reduce((acc,q) => acc + (this.answers[q.id] || 0), 0);
+        const pct = (sum / qs.length) * 100;
+        let level = 'ok';
+        if(pct >= 60) level = 'danger';
+        else if(pct >= 30) level = 'warn';
+        return { key, label: this.pillarLabels[key], pct, level };
+      });
+      const weakest = this.pillarResults.reduce((a,b) => b.pct > a.pct ? b : a, this.pillarResults[0]);
+      const topikLabel = this.topikLabels[this.profile.topik];
+      let message = this.pillarMessages[weakest.key];
+      if(topikLabel){
+        message += ` Ini sejajar dengan topik yang anda pilih tadi — ${topikLabel} — yang akan menjadi salah satu fokus utama sesi 18 Oktober nanti.`;
+      }
+      this.weakestPillar = { key: weakest.key, message };
+    },
+  };
+}
+</script>
+</body>
+</html>
