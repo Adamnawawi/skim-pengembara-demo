@@ -138,7 +138,7 @@
     transition:border-color .15s, background .15s, transform .1s;font-family:inherit;
   }
   .option-btn:active{transform:scale(.99);}
-  .option-btn:hover{border-color:var(--green);}
+  .option-btn:hover{border-color:#C7CCD2;box-shadow:0 2px 8px rgba(11,47,92,.07);}
   .option-btn.selected{border-color:var(--green);background:#F1FAF6;color:var(--green-dark);}
   .option-check{width:20px;height:20px;border-radius:50%;border:2px solid var(--line);flex-shrink:0;}
   .option-btn.selected .option-check{border-color:var(--green);background:var(--green);}
@@ -193,6 +193,15 @@
   .gap-hero-consequence{font-size:17px;font-weight:700;margin:16px 0 0;color:#fff;text-wrap:balance;}
   .gap-hero-message{font-size:14.5px;margin:10px 0 0;color:rgba(255,255,255,.88);}
   .pillar-breakdown-label{font-size:12px;font-weight:700;letter-spacing:.03em;text-transform:uppercase;color:var(--ink-soft);margin-bottom:12px;}
+
+  .answers-review{margin-top:16px;padding:18px;background:#fff;border:1px solid var(--line);border-radius:16px;}
+  .answers-review-heading{font-size:12px;font-weight:800;letter-spacing:.03em;text-transform:uppercase;color:var(--green-dark);margin-bottom:10px;}
+  .answer-row{padding:10px 0;border-bottom:1px solid var(--line);}
+  .answer-row:last-child{border-bottom:none;}
+  .answer-row-q{font-size:13.5px;color:var(--ink);line-height:1.5;}
+  .answer-row-subtitle{font-weight:700;color:var(--navy);}
+  .answer-row-subtitle::after{content:' — ';}
+  .answer-row-a{font-size:13px;font-weight:700;color:var(--green-dark);margin-top:4px;}
 
   .confirm-screen{align-items:center;text-align:center;justify-content:center;min-height:100vh;}
   .confirm-icon{font-size:52px;margin-bottom:18px;}
@@ -425,6 +434,31 @@
         </div>
       </template>
 
+      <button class="btn btn-ghost btn-block" style="margin-top:6px;" @click="showAnswers = !showAnswers">
+        <span x-text="showAnswers ? T.answersReview.toggleHide : T.answersReview.toggleShow"></span>
+      </button>
+
+      <div class="answers-review" x-show="showAnswers" x-transition>
+        <div class="answers-review-heading" x-text="T.answersReview.questionsHeading"></div>
+        <template x-for="(a, idx) in answeredQuestions" :key="idx">
+          <div class="answer-row">
+            <div class="answer-row-q">
+              <span class="answer-row-subtitle" x-text="a.subtitle"></span>
+              <span x-text="a.text"></span>
+            </div>
+            <div class="answer-row-a" x-text="a.answer"></div>
+          </div>
+        </template>
+
+        <div class="answers-review-heading" style="margin-top:18px;" x-text="T.answersReview.profileHeading"></div>
+        <template x-for="(a, idx) in answeredProfile" :key="idx">
+          <div class="answer-row">
+            <div class="answer-row-q"><span x-text="a.text"></span></div>
+            <div class="answer-row-a" x-text="a.answer"></div>
+          </div>
+        </template>
+      </div>
+
       <div class="nav-row" style="padding-top:8px;flex-direction:column;">
         <button class="btn btn-primary btn-block" style="flex:0 0 auto;" @click="screen='confirm'" x-text="ctaLabel"></button>
         <p style="color:var(--ink-soft);font-size:12px;text-align:center;margin-top:12px;" x-text="T.result.reassurance"></p>
@@ -573,6 +607,12 @@ const translations = {
       demoNote: '(Demo — tiada mesej sebenar dihantar)',
     },
     bridge: { johor:'Johor', singapura:'Singapura', step:'Langkah {step} / {total}' },
+    answersReview: {
+      toggleShow: 'Lihat Semula Semua Jawapan Saya',
+      toggleHide: 'Sembunyikan Jawapan',
+      questionsHeading: 'Jawapan Soalan Tinjauan',
+      profileHeading: 'Maklumat Profil',
+    },
   },
 
   en: {
@@ -974,6 +1014,7 @@ function quizApp(){
 
     weakestPillarKey: 'commute',
     heroDisplayPct: 0,
+    showAnswers: false,
 
     init(){
       const params = new URLSearchParams(window.location.search);
@@ -982,7 +1023,7 @@ function quizApp(){
       this.$watch('lang', (v) => { document.documentElement.lang = v; });
     },
 
-    get T(){ return translations[this.lang] || translations.ms; },
+    get T(){ return { ...translations.ms, ...(translations[this.lang] || {}) }; },
 
     fmt(str, vars){
       return str.replace(/\{(\w+)\}/g, (m, k) => (vars[k] !== undefined ? vars[k] : m));
@@ -1018,6 +1059,22 @@ function quizApp(){
         if(pct >= 60) level = 'danger';
         else if(pct >= 30) level = 'warn';
         return { key, label: this.T.pillarLabels[key], pct, level, atRisk, total: qs.length };
+      });
+    },
+
+    get answeredQuestions(){
+      return this.questionMeta.map(meta => {
+        const q = this.T.questions[meta.id];
+        const val = this.answers[meta.id];
+        const opt = this.T.scoreOptions.find(o => o.value === val);
+        return { subtitle: q.subtitle, text: q.text, answer: opt ? opt.label : '' };
+      });
+    },
+    get answeredProfile(){
+      return this.profileMeta.map(meta => {
+        const pq = this.T.profileQuestions[meta.id];
+        const val = this.profile[meta.id];
+        return { text: pq.text, answer: pq.options[val] || '' };
       });
     },
 
