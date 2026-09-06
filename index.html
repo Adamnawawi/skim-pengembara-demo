@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
 <title>Suara Anda, Skim Kita — PERKESO Johor</title>
 <style>
-  @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@800;900&family=Inter:wght@400;500;600&display=swap');
+  @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@800;900&family=Inter:wght@400;500;600&family=Noto+Sans+SC:wght@500;700&family=Noto+Sans+Tamil:wght@500;700&display=swap');
 
   :root{
     --navy:#0B2F5C;
@@ -24,14 +24,14 @@
   *{box-sizing:border-box;}
   html,body{margin:0;padding:0;}
   body{
-    font-family:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;
+    font-family:'Inter','Noto Sans SC','Noto Sans Tamil',-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;
     background:var(--paper);
     color:var(--ink);
     line-height:1.65;
     -webkit-font-smoothing:antialiased;
   }
   h1,h2,h3,.headline{
-    font-family:'Montserrat','Arial Black',sans-serif;
+    font-family:'Montserrat','Noto Sans SC','Noto Sans Tamil','Arial Black',sans-serif;
     font-weight:900;
     line-height:1.15;
     letter-spacing:-0.01em;
@@ -45,6 +45,14 @@
     background:var(--navy-dark);color:#fff;font-size:11px;letter-spacing:.04em;
     text-align:center;padding:6px 10px;font-weight:600;
   }
+
+  .lang-toggle{display:flex;gap:6px;padding:9px 12px;background:var(--navy-dark);justify-content:center;flex-wrap:wrap;border-top:1px solid rgba(255,255,255,.08);}
+  .lang-btn{
+    background:rgba(255,255,255,.08);color:#CFE0F0;border:1px solid rgba(255,255,255,.16);
+    border-radius:999px;padding:5px 13px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;
+    transition:background .15s, color .15s;
+  }
+  .lang-btn.active{background:var(--amber);color:var(--navy-dark);border-color:var(--amber);}
 
   .screen{padding:28px 22px 34px;flex:1;display:flex;flex-direction:column;animation:fadeUp .35s ease both;}
   @keyframes fadeUp{from{opacity:0;transform:translateY(10px);}to{opacity:1;transform:translateY(0);}}
@@ -113,7 +121,7 @@
     display:inline-block;font-size:11px;font-weight:700;letter-spacing:.03em;text-transform:uppercase;
     color:var(--green-dark);background:#E7F5EF;padding:5px 10px;border-radius:999px;margin-bottom:14px;
   }
-  .question-text{font-size:21px;font-weight:800;font-family:'Montserrat',sans-serif;color:var(--navy);margin-bottom:22px;}
+  .question-text{font-size:21px;font-weight:800;font-family:'Montserrat','Noto Sans SC','Noto Sans Tamil',sans-serif;color:var(--navy);margin-bottom:22px;}
 
   .option-btn{
     display:flex;align-items:center;justify-content:space-between;width:100%;text-align:left;
@@ -145,9 +153,9 @@
   .result-hero p{color:var(--ink-soft);margin-top:8px;font-size:15px;}
 
   .pillar-row{margin-bottom:20px;}
-  .pillar-row-top{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:8px;}
+  .pillar-row-top{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:8px;gap:10px;}
   .pillar-row-top .name{font-weight:700;font-size:14.5px;color:var(--navy);}
-  .pillar-row-top .pct{font-weight:800;font-size:14.5px;}
+  .pillar-row-top .pct{font-weight:800;font-size:14.5px;white-space:nowrap;}
   .gap-track{height:12px;border-radius:999px;background:#EDEAE1;overflow:hidden;}
   .gap-fill{height:100%;border-radius:999px;transition:width .7s ease;}
   .gap-fill.ok{background:var(--green);}
@@ -170,7 +178,7 @@
     background:rgba(255,255,255,.18);padding:5px 12px;border-radius:999px;margin-bottom:14px;
   }
   .gap-hero-number{
-    font-family:'Montserrat','Arial Black',sans-serif;font-weight:900;font-size:64px;line-height:1;
+    font-family:'Montserrat','Noto Sans SC','Noto Sans Tamil','Arial Black',sans-serif;font-weight:900;font-size:64px;line-height:1;
     font-variant-numeric:tabular-nums;
   }
   .gap-hero-fraction{font-size:14px;font-weight:600;color:rgba(255,255,255,.85);margin-top:6px;}
@@ -188,18 +196,23 @@
 <body>
 <div id="app" x-data="quizApp()" x-init="init()">
 
-  <div class="demo-flag">DEMO STATIK — TIADA DATA DIHANTAR ATAU DISIMPAN</div>
+  <div class="demo-flag" x-text="T.demoFlag"></div>
+  <div class="lang-toggle">
+    <template x-for="opt in langOptions" :key="opt.code">
+      <button class="lang-btn" :class="{active: lang === opt.code}" @click="lang = opt.code" x-text="opt.label"></button>
+    </template>
+  </div>
 
   <!-- ================= HOOK SCREEN ================= -->
   <template x-if="screen === 'hook'">
     <div class="screen hook-screen">
       <div>
-        <div class="hook-eyebrow">Suara Anda, Skim Kita</div>
-        <h1 class="hook-headline">Kerja Singapura. Tapi... kalau <em>kecemasan</em>, siapa tanggung?</h1>
-        <p class="hook-sub">Setiap hari anda menyeberangi tambak untuk mencari rezeki. PERKESO nak tahu — di mana jurang perlindungan keselamatan/kesihatan anda & bagaimana kami boleh bantu?</p>
+        <div class="hook-eyebrow" x-text="T.hook.eyebrow"></div>
+        <h1 class="hook-headline" x-text="T.hook.headline"></h1>
+        <p class="hook-sub" x-text="T.hook.sub"></p>
       </div>
       <div class="hook-scene">
-        <svg viewBox="0 0 520 220" preserveAspectRatio="xMidYMax slice" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Ilustrasi Tambak menghubungkan Johor dan Singapura, dengan trafik pagi">
+        <svg viewBox="0 0 520 220" preserveAspectRatio="xMidYMax slice" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Illustration of the Causeway linking Johor and Singapore, with morning traffic">
           <defs>
             <radialGradient id="sunGlow" cx="50%" cy="100%" r="65%">
               <stop offset="0%" stop-color="#EF9F27" stop-opacity="0.5"/>
@@ -265,8 +278,8 @@
         </svg>
       </div>
       <div class="hook-footer">
-        <button class="btn btn-primary btn-block" @click="screen='info'">Mula Kuiz 2 Minit</button>
-        <p style="color:#9FB3C8;font-size:12px;text-align:center;margin-top:12px;">Sesi Libat Urus PERKESO Johor · 18 Oktober 2026</p>
+        <button class="btn btn-primary btn-block" @click="screen='info'" x-text="T.hook.cta"></button>
+        <p style="color:#9FB3C8;font-size:12px;text-align:center;margin-top:12px;" x-text="T.hook.caption"></p>
       </div>
     </div>
   </template>
@@ -275,38 +288,36 @@
   <template x-if="screen === 'info'">
     <div class="screen">
       <div class="bridge-wrap" x-html="bridgeHtml(1, totalSteps)"></div>
-      <h2 style="font-size:22px;margin-bottom:6px;">Sikit je maklumat asas anda</h2>
-      <p style="color:var(--ink-soft);font-size:14px;margin:0 0 20px;">Kami guna maklumat ini untuk daftarkan anda ke sesi 18 Oktober atau hantar ringkasan hasil kuiz. Tiada tujuan pemasaran lain.</p>
+      <h2 style="font-size:22px;margin-bottom:6px;" x-text="T.info.heading"></h2>
+      <p style="color:var(--ink-soft);font-size:14px;margin:0 0 20px;" x-text="T.info.sub"></p>
       <div class="card">
         <div class="field">
-          <label>Nama / Nama Panggilan</label>
-          <input type="text" x-model="info.nama" placeholder="Nama anda">
+          <label x-text="T.info.labelNama"></label>
+          <input type="text" x-model="info.nama" :placeholder="T.info.placeholderNama">
         </div>
         <div class="field">
-          <label>Nombor WhatsApp</label>
+          <label x-text="T.info.labelWhatsapp"></label>
           <input type="tel" x-model="info.whatsapp" placeholder="01X-XXX XXXX">
-          <div class="field-hint">Untuk terima ringkasan skor.</div>
+          <div class="field-hint" x-text="T.info.hintWhatsapp"></div>
         </div>
         <div class="field">
-          <label>E-mel (pilihan)</label>
-          <input type="email" x-model="info.emel" placeholder="nama@emel.com">
-          <div class="field-hint">Jika anda pilih terima ringkasan melalui e-mel nanti.</div>
+          <label x-text="T.info.labelEmel"></label>
+          <input type="email" x-model="info.emel" :placeholder="T.info.placeholderEmel">
+          <div class="field-hint" x-text="T.info.hintEmel"></div>
         </div>
         <div class="field">
-          <label>Kawasan Tempat Tinggal di Johor</label>
+          <label x-text="T.info.labelKawasan"></label>
           <select x-model="info.kawasan">
-            <option value="" disabled selected>Pilih kawasan</option>
-            <option value="JB">Johor Bahru</option>
-            <option value="Kulai">Kulai</option>
-            <option value="Iskandar Puteri">Iskandar Puteri</option>
-            <option value="Pasir Gudang">Pasir Gudang</option>
-            <option value="Lain-lain">Lain-lain</option>
+            <option value="" disabled selected x-text="T.info.kawasanPlaceholder"></option>
+            <template x-for="opt in T.info.kawasanOptions" :key="opt.value">
+              <option :value="opt.value" x-text="opt.label"></option>
+            </template>
           </select>
-          <div class="field-hint">Data ini disimulasikan sahaja dalam demo ini — tidak dihantar ke mana-mana pelayan.</div>
+          <div class="field-hint" x-text="T.info.hintKawasan"></div>
         </div>
       </div>
       <div class="nav-row">
-        <button class="btn btn-primary btn-block" :disabled="!infoValid" @click="goToQuiz()">Teruskan</button>
+        <button class="btn btn-primary btn-block" :disabled="!infoValid" @click="goToQuiz()" x-text="T.info.continueBtn"></button>
       </div>
     </div>
   </template>
@@ -320,7 +331,7 @@
         <span class="pillar-tag" x-text="currentQuestion.pillarLabel"></span>
         <div class="question-text" x-text="currentQuestion.text"></div>
         <div>
-          <template x-for="opt in scoreOptions" :key="opt.value">
+          <template x-for="opt in T.scoreOptions" :key="opt.value">
             <button class="option-btn" :class="{selected: answers[currentQuestion.id] === opt.value}" @click="selectQuizAnswer(opt.value)">
               <span x-text="opt.label"></span>
               <span class="option-check"></span>
@@ -328,7 +339,7 @@
           </template>
         </div>
         <div class="nav-row">
-          <button class="btn btn-ghost" @click="prevQuizStep()">Kembali</button>
+          <button class="btn btn-ghost" @click="prevQuizStep()" x-text="T.backBtn"></button>
         </div>
       </div>
     </div>
@@ -337,10 +348,10 @@
   <!-- ================= PROFILE QUESTIONS ================= -->
   <template x-if="screen === 'profile'">
     <div class="screen">
-      <div class="bridge-wrap" x-html="bridgeHtml(profileIndex + scoredQuestions.length + 2, totalSteps)"></div>
+      <div class="bridge-wrap" x-html="bridgeHtml(profileIndex + questionMeta.length + 2, totalSteps)"></div>
       <div class="q-block" :class="{'q-fade': transitioning}">
         <div class="q-scene q-scene-profile" x-html="profileSceneHtml()"></div>
-        <span class="pillar-tag" style="background:#FCEFDC;color:#9A5B0E;">Sikit lagi</span>
+        <span class="pillar-tag" style="background:#FCEFDC;color:#9A5B0E;" x-text="T.profileTag"></span>
         <div class="question-text" x-text="currentProfileQ.text"></div>
         <div>
           <template x-for="opt in currentProfileQ.options" :key="opt.value">
@@ -351,7 +362,7 @@
           </template>
         </div>
         <div class="nav-row">
-          <button class="btn btn-ghost" @click="prevProfileStep()">Kembali</button>
+          <button class="btn btn-ghost" @click="prevProfileStep()" x-text="T.backBtn"></button>
         </div>
       </div>
     </div>
@@ -361,24 +372,24 @@
   <template x-if="screen === 'result'">
     <div class="screen">
       <div class="result-hero">
-        <span class="hook-eyebrow" style="color:var(--green-dark);">Keputusan Anda</span>
-        <h2 class="headline"><span x-text="info.nama || 'Sahabat'"></span>, ini jurang perlindungan anda</h2>
+        <span class="hook-eyebrow" style="color:var(--green-dark);" x-text="T.result.eyebrow"></span>
+        <h2 class="headline" x-text="fmt(T.result.headingSuffix, {name: info.nama || T.result.defaultName})"></h2>
       </div>
 
       <div class="gap-hero" :class="weakestPillar.level">
         <span class="gap-hero-tag" x-text="weakestPillar.label"></span>
         <div class="gap-hero-number"><span x-text="heroDisplayPct"></span>%</div>
-        <div class="gap-hero-fraction" x-text="weakestPillar.atRisk + ' daripada ' + weakestPillar.total + ' soalan menunjukkan jurang di sini'"></div>
+        <div class="gap-hero-fraction" x-text="fmt(T.result.heroFraction, {atRisk: weakestPillar.atRisk, total: weakestPillar.total})"></div>
         <p class="gap-hero-consequence" x-text="weakestPillar.consequence"></p>
         <p class="gap-hero-message" x-text="weakestPillar.message"></p>
       </div>
 
-      <div class="pillar-breakdown-label">Pecahan mengikut tonggak</div>
+      <div class="pillar-breakdown-label" x-text="T.result.breakdownLabel"></div>
       <template x-for="p in pillarResults" :key="p.key">
         <div class="pillar-row">
           <div class="pillar-row-top">
             <span class="name" x-text="p.label"></span>
-            <span class="pct" :class="p.level" x-text="Math.round(p.pct) + '% jurang'"></span>
+            <span class="pct" :class="p.level" x-text="fmt(T.result.pctTemplate, {pct: Math.round(p.pct)})"></span>
           </div>
           <div class="gap-track">
             <div class="gap-fill" :class="p.level" :style="'width:' + p.pct + '%'"></div>
@@ -388,7 +399,7 @@
 
       <div class="nav-row" style="padding-top:8px;flex-direction:column;">
         <button class="btn btn-primary btn-block" style="flex:0 0 auto;" @click="screen='confirm'" x-text="ctaLabel"></button>
-        <p style="color:var(--ink-soft);font-size:12px;text-align:center;margin-top:12px;">Percuma · Sarapan & makan tengah hari disediakan untuk sesi pagi</p>
+        <p style="color:var(--ink-soft);font-size:12px;text-align:center;margin-top:12px;" x-text="T.result.reassurance"></p>
       </div>
     </div>
   </template>
@@ -397,75 +408,92 @@
   <template x-if="screen === 'confirm'">
     <div class="screen confirm-screen">
       <div class="confirm-icon" x-text="profile.hadir === 'pagi' ? '🎟️' : '📩'"></div>
-      <h2 class="headline" x-text="profile.hadir === 'pagi' ? 'Pendaftaran anda diterima!' : 'Ringkasan sedang disediakan!'"></h2>
-      <p x-show="profile.hadir === 'pagi'">Terima kasih, <span x-text="info.nama"></span>. Tempat anda untuk Sesi Pagi (9.00 pagi – 1.00 tengah hari) pada 18 Oktober 2026 di Johor telah direkodkan — kemasukan percuma, sarapan, makan tengah hari & cenderahati disediakan. Kami akan hubungi anda melalui WhatsApp untuk butiran lanjut.</p>
-      <p x-show="profile.hadir !== 'pagi'">Terima kasih, <span x-text="info.nama"></span>. Ringkasan hasil kuiz dan maklumat skim akan dihantar ke WhatsApp/emel anda tidak lama lagi.</p>
-      <button class="btn btn-ghost" style="flex:0 0 auto;margin-top:24px;" @click="screen='result'">← Lihat semula keputusan saya</button>
-      <p style="margin-top:20px;font-size:12px;color:#A6ADB4;">(Demo — tiada mesej sebenar dihantar)</p>
+      <h2 class="headline" x-text="profile.hadir === 'pagi' ? T.confirm.headingPagi : T.confirm.headingJauh"></h2>
+      <p x-show="profile.hadir === 'pagi'" x-text="fmt(T.confirm.bodyPagi, {nama: info.nama})"></p>
+      <p x-show="profile.hadir !== 'pagi'" x-text="fmt(T.confirm.bodyJauh, {nama: info.nama})"></p>
+      <button class="btn btn-ghost" style="flex:0 0 auto;margin-top:24px;" @click="screen='result'" x-text="T.confirm.backLink"></button>
+      <p style="margin-top:20px;font-size:12px;color:#A6ADB4;" x-text="T.confirm.demoNote"></p>
     </div>
   </template>
 
-  <div class="footer-note" x-show="screen !== 'hook' && screen !== 'confirm'">PERKESO Johor · Suara Anda, Skim Kita · Demo dalaman</div>
+  <div class="footer-note" x-show="screen !== 'hook' && screen !== 'confirm'" x-text="T.footerNote"></div>
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/alpinejs@3.14.1/dist/cdn.min.js" defer></script>
 <script>
-function quizApp(){
-  return {
-    screen: 'hook',
-    ref: null,
-    utm_source: null,
-
-    info: { nama:'', whatsapp:'', emel:'', kawasan:'' },
-    quizIndex: 0,
-    profileIndex: 0,
-    answers: {},
-    profile: {},
-
+const translations = {
+  ms: {
+    demoFlag: 'DEMO STATIK — TIADA DATA DIHANTAR ATAU DISIMPAN',
+    footerNote: 'PERKESO Johor · Suara Anda, Skim Kita · Demo dalaman',
+    profileTag: 'Sikit lagi',
+    backBtn: 'Kembali',
+    hook: {
+      eyebrow: 'Suara Anda, Skim Kita',
+      headline: 'Kerja Singapura. Tapi... kalau kecemasan, siapa tanggung?',
+      sub: 'Setiap hari anda menyeberangi tambak untuk mencari rezeki. PERKESO nak tahu — di mana jurang perlindungan keselamatan/kesihatan anda & bagaimana kami boleh bantu?',
+      cta: 'Mula Kuiz 2 Minit',
+      caption: 'Sesi Libat Urus PERKESO Johor · 18 Oktober 2026',
+    },
+    info: {
+      heading: 'Sikit je maklumat asas anda',
+      sub: 'Kami guna maklumat ini untuk daftarkan anda ke sesi 18 Oktober atau hantar ringkasan hasil kuiz. Tiada tujuan pemasaran lain.',
+      labelNama: 'Nama / Nama Panggilan',
+      placeholderNama: 'Nama anda',
+      labelWhatsapp: 'Nombor WhatsApp',
+      hintWhatsapp: 'Untuk terima ringkasan skor.',
+      labelEmel: 'E-mel (pilihan)',
+      placeholderEmel: 'nama@emel.com',
+      hintEmel: 'Jika anda pilih terima ringkasan melalui e-mel nanti.',
+      labelKawasan: 'Kawasan Tempat Tinggal di Johor',
+      kawasanPlaceholder: 'Pilih kawasan',
+      kawasanOptions: [
+        {value:'JB', label:'Johor Bahru'},
+        {value:'Kulai', label:'Kulai'},
+        {value:'Iskandar Puteri', label:'Iskandar Puteri'},
+        {value:'Pasir Gudang', label:'Pasir Gudang'},
+        {value:'Lain-lain', label:'Lain-lain'},
+      ],
+      hintKawasan: 'Data ini disimulasikan sahaja dalam demo ini — tidak dihantar ke mana-mana pelayan.',
+      continueBtn: 'Teruskan',
+    },
     scoreOptions: [
       { label:'Ya', value:0 },
       { label:'Kurang pasti', value:0.5 },
       { label:'Tidak', value:1 },
     ],
-
-    scoredQuestions: [
-      { id:'c1', pillar:'commute', pillarLabel:'Rutin & Kesejahteraan Perjalanan', text:'Perjalanan Harian: Adakah anda mempunyai perancangan masa dan mod perjalanan yang selesa untuk berulang-alik merentas Tambak/Linkedua setiap minggu?' },
-      { id:'c2', pillar:'commute', pillarLabel:'Rutin & Kesejahteraan Perjalanan', text:'Kecemasan Jalan Raya: Jika kenderaan atau pengangkutan anda terkandas di laluan sempadan, adakah anda mempunyai jaringan bantuan segera yang boleh dipercayai di Johor?' },
-      { id:'c3', pillar:'commute', pillarLabel:'Rutin & Kesejahteraan Perjalanan', text:'Rehat & Pemulihan: Jika anda memerlukan cuti sakit / cuti bagi menjalani rawatan perubatan (contoh: MC beberapa minggu), adakah pendapatan bulanan anda kekal tidak terjejas?' },
-      { id:'f1', pillar:'financial', pillarLabel:'Kestabilan Simpanan & Keluarga di Tanah Air', text:'Penyambung Nafkah: Adakah hasil titik peluh anda di Singapura kini menjadi tunjang utama untuk perbelanjaan keluarga (anak, pasangan, atau ibu bapa)?' },
-      { id:'f2', pillar:'financial', pillarLabel:'Kestabilan Simpanan & Keluarga di Tanah Air', text:'Jaringan Keselamatan Malaysia: Selain simpanan bank biasa, adakah anda mempunyai sebarang tabung atau dana kebajikan rasmi di Malaysia yang bertindak sebagai "payung kecemasan"?' },
-      { id:'f3', pillar:'financial', pillarLabel:'Kestabilan Simpanan & Keluarga di Tanah Air', text:'Kesinambungan Sara Hidup: Sekiranya berlaku musibah atau kecederaan di luar jangka, adakah anda mempunyai jaringan sokongan yang mampu menyediakan rawatan pemulihan fizikal berterusan serta bantuan sara hidup berkala untuk keluarga anda?' },
-      { id:'r1', pillar:'rights', pillarLabel:'Hak & Suara Pekerja Luar Negara', text:'Pampasan Adil: Adakah anda tahu hak kebajikan dan pampasan yang sepatutnya anda terima sekiranya berlaku sebarang kesulitan semasa bertugas?' },
-      { id:'r2', pillar:'rights', pillarLabel:'Hak & Suara Pekerja Luar Negara', text:'Kemudahan: Adakah anda berminat jika Malaysia menyediakan pusat sokongan atau rawatan khas yang mudah diakses untuk pekerja rentas sempadan?' },
-      { id:'r3', pillar:'rights', pillarLabel:'Hak & Suara Pekerja Luar Negara', text:'Masa Depan Sektor: Adakah anda bersetuju bahawa pekerja Malaysia di Singapura wajar mempunyai skim kebajikan rasmi bertaraf antarabangsa yang diiktiraf kerajaan?' },
-      { id:'r4', pillar:'rights', pillarLabel:'Hak & Suara Pekerja Luar Negara', text:'Peluang Bersuara: Adakah anda ingin pandangan dan pengalaman sebenar anda diambil kira dalam penggubalan dasar bantuan untuk pekerja seperti anda?' },
-    ],
-
-    profileQuestions: [
-      { id:'tempoh', text:'Berapa lama anda telah bekerja di Singapura?', options:[
-        {label:'Kurang 1 tahun (Masih menyesuaikan diri)', value:'<1'},
-        {label:'1 – 5 tahun (Stabil)', value:'1-5'},
-        {label:'Lebih 5 tahun (Berpengalaman luas)', value:'>5'} ] },
-      { id:'moda', text:'Mod utama perjalanan anda:', options:[
-        {label:'Motosikal', value:'motosikal'},
-        {label:'Bas Awam / Bas Kilang', value:'bas'},
-        {label:'Kereta Sendiri / Kereta Sewa', value:'kereta'},
-        {label:'Berjalan kaki / Kereta api (RTS/KTM)', value:'jalan_rts'} ] },
-      { id:'impian', text:'Apakah impian/keutamaan terbesar anda dalam masa 3 tahun akan datang?', options:[
-        {label:'Membina aset/rumah di Johor dengan tenang', value:'aset_rumah'},
-        {label:'Memastikan masa depan pendidikan anak-anak terjamin', value:'pendidikan_anak'},
-        {label:'Mengumpul modal untuk berniaga di tanah air', value:'modal_perniagaan'},
-        {label:'Mendapat jaminan kebajikan setaraf pekerja di Malaysia', value:'jaminan_kebajikan'} ] },
-      { id:'topik', text:'Apakah topik yang paling bermanfaat untuk anda bincangkan bersama pihak berwajib?', options:[
-        {label:'Kemudahan rawatan perubatan & klinik panel di Johor', value:'rawatan_perubatan'},
-        {label:'Skim bantuan kewangan kecemasan jika hilang punca pendapatan', value:'bantuan_kewangan'},
-        {label:'Pelan persaraan dan simpanan masa depan', value:'persaraan_simpanan'},
-        {label:'Isu pasport, permit, dan kelancaran sempadan', value:'pasport_permit'} ] },
-      { id:'hadir', text:'Pilihan Kehadiran Sesi Libat Urus Khas (Ahad, 18 Oktober 2026):', options:[
-        {label:'Hadir Sesi Pagi (9.00 pagi – 1.00 tengah hari) — Kemasukan Percuma, Sarapan, Makan Tengah Hari & Cenderahati Disediakan', value:'pagi'},
-        {label:'Tidak dapat hadir secara fizikal, tetapi ingin menerima ringkasan melalui WhatsApp/E-mel', value:'jauh'} ] },
-    ],
-
+    questions: {
+      c1: 'Perjalanan Harian: Adakah anda mempunyai perancangan masa dan mod perjalanan yang selesa untuk berulang-alik merentas Tambak/Linkedua setiap minggu?',
+      c2: 'Kecemasan Jalan Raya: Jika kenderaan atau pengangkutan anda terkandas di laluan sempadan, adakah anda mempunyai jaringan bantuan segera yang boleh dipercayai di Johor?',
+      c3: 'Rehat & Pemulihan: Jika anda memerlukan cuti sakit / cuti bagi menjalani rawatan perubatan (contoh: MC beberapa minggu), adakah pendapatan bulanan anda kekal tidak terjejas?',
+      f1: 'Penyambung Nafkah: Adakah hasil titik peluh anda di Singapura kini menjadi tunjang utama untuk perbelanjaan keluarga (anak, pasangan, atau ibu bapa)?',
+      f2: 'Jaringan Keselamatan Malaysia: Selain simpanan bank biasa, adakah anda mempunyai sebarang tabung atau dana kebajikan rasmi di Malaysia yang bertindak sebagai "payung kecemasan"?',
+      f3: 'Kesinambungan Sara Hidup: Sekiranya berlaku musibah atau kecederaan di luar jangka, adakah anda mempunyai jaringan sokongan yang mampu menyediakan rawatan pemulihan fizikal berterusan serta bantuan sara hidup berkala untuk keluarga anda?',
+      r1: 'Pampasan Adil: Adakah anda tahu hak kebajikan dan pampasan yang sepatutnya anda terima sekiranya berlaku sebarang kesulitan semasa bertugas?',
+      r2: 'Kemudahan: Adakah anda berminat jika Malaysia menyediakan pusat sokongan atau rawatan khas yang mudah diakses untuk pekerja rentas sempadan?',
+      r3: 'Masa Depan Sektor: Adakah anda bersetuju bahawa pekerja Malaysia di Singapura wajar mempunyai skim kebajikan rasmi bertaraf antarabangsa yang diiktiraf kerajaan?',
+      r4: 'Peluang Bersuara: Adakah anda ingin pandangan dan pengalaman sebenar anda diambil kira dalam penggubalan dasar bantuan untuk pekerja seperti anda?',
+    },
+    profileQuestions: {
+      tempoh: { text:'Berapa lama anda telah bekerja di Singapura?', options:{
+        '<1':'Kurang 1 tahun (Masih menyesuaikan diri)', '1-5':'1 – 5 tahun (Stabil)', '>5':'Lebih 5 tahun (Berpengalaman luas)' } },
+      moda: { text:'Mod utama perjalanan anda:', options:{
+        motosikal:'Motosikal', bas:'Bas Awam / Bas Kilang', kereta:'Kereta Sendiri / Kereta Sewa', jalan_rts:'Berjalan kaki / Kereta api (RTS/KTM)' } },
+      impian: { text:'Apakah impian/keutamaan terbesar anda dalam masa 3 tahun akan datang?', options:{
+        aset_rumah:'Membina aset/rumah di Johor dengan tenang', pendidikan_anak:'Memastikan masa depan pendidikan anak-anak terjamin',
+        modal_perniagaan:'Mengumpul modal untuk berniaga di tanah air', jaminan_kebajikan:'Mendapat jaminan kebajikan setaraf pekerja di Malaysia' } },
+      topik: { text:'Apakah topik yang paling bermanfaat untuk anda bincangkan bersama pihak berwajib?', options:{
+        rawatan_perubatan:'Kemudahan rawatan perubatan & klinik panel di Johor', bantuan_kewangan:'Skim bantuan kewangan kecemasan jika hilang punca pendapatan',
+        persaraan_simpanan:'Pelan persaraan dan simpanan masa depan', pasport_permit:'Isu pasport, permit, dan kelancaran sempadan' } },
+      hadir: { text:'Pilihan Kehadiran Sesi Libat Urus Khas (Ahad, 18 Oktober 2026):', options:{
+        pagi:'Hadir Sesi Pagi (9.00 pagi – 1.00 tengah hari) — Kemasukan Percuma, Sarapan, Makan Tengah Hari & Cenderahati Disediakan',
+        jauh:'Tidak dapat hadir secara fizikal, tetapi ingin menerima ringkasan melalui WhatsApp/E-mel' } },
+    },
+    pillarLabels: {
+      commute: 'Rutin & Kesejahteraan Perjalanan',
+      financial: 'Kestabilan Simpanan & Keluarga di Tanah Air',
+      rights: 'Hak & Suara Pekerja Luar Negara',
+    },
+    pillarShortLabels: { commute:'perjalanan', financial:'kewangan keluarga', rights:'hak pekerja' },
     pillarMessages: {
       commute: 'Rutin perjalanan anda merentas Tambak/Linkedua nampaknya membawa risiko yang belum sepenuhnya tertangani — dari kecemasan jalan raya hinggalah tekanan pendapatan semasa tempoh rehat perubatan.',
       financial: 'Kestabilan simpanan dan jaringan keselamatan keluarga anda di tanah air berkemungkinan belum mencukupi sekiranya berlaku musibah atau kehilangan pendapatan secara tiba-tiba.',
@@ -476,49 +504,477 @@ function quizApp(){
       financial: 'Jika pendapatan Singapura terhenti walau sebulan, keluarga anda di Malaysia turut terjejas.',
       rights: 'Anda mungkin tidak tahu hak sebenar anda sehingga sudah terlambat untuk menuntutnya.',
     },
-    pillarLabels: {
-      commute: 'Rutin & Kesejahteraan Perjalanan',
-      financial: 'Kestabilan Simpanan & Keluarga',
-      rights: 'Hak & Suara Pekerja Luar Negara',
-    },
-    pillarShortLabels: {
-      commute: 'perjalanan',
-      financial: 'kewangan keluarga',
-      rights: 'hak pekerja',
-    },
     topikLabels: {
       rawatan_perubatan: 'kemudahan rawatan perubatan & klinik panel di Johor',
       bantuan_kewangan: 'skim bantuan kewangan kecemasan jika hilang punca pendapatan',
       persaraan_simpanan: 'pelan persaraan dan simpanan masa depan',
       pasport_permit: 'isu pasport, permit, dan kelancaran sempadan',
     },
+    result: {
+      eyebrow: 'Keputusan Anda',
+      defaultName: 'Sahabat',
+      headingSuffix: '{name}, ini jurang perlindungan anda',
+      heroFraction: '{atRisk} daripada {total} soalan menunjukkan jurang di sini',
+      breakdownLabel: 'Pecahan mengikut tonggak',
+      pctTemplate: '{pct}% jurang',
+      topikTieIn: 'Ini sejajar dengan topik yang anda pilih tadi — {topik} — yang akan menjadi salah satu fokus utama sesi 18 Oktober nanti.',
+      ctaAttend: 'Dapatkan Jawapan Tentang {topic} — Daftar 18 Okt',
+      ctaRemote: 'Hantar Ringkasan Tentang {topic} ke WhatsApp/E-mel Saya',
+      reassurance: 'Percuma · Sarapan & makan tengah hari disediakan untuk sesi pagi',
+    },
+    confirm: {
+      headingPagi: 'Pendaftaran anda diterima!',
+      headingJauh: 'Ringkasan sedang disediakan!',
+      bodyPagi: 'Terima kasih, {nama}. Tempat anda untuk Sesi Pagi (9.00 pagi – 1.00 tengah hari) pada 18 Oktober 2026 di Johor telah direkodkan — kemasukan percuma, sarapan, makan tengah hari & cenderahati disediakan. Kami akan hubungi anda melalui WhatsApp untuk butiran lanjut.',
+      bodyJauh: 'Terima kasih, {nama}. Ringkasan hasil kuiz dan maklumat skim akan dihantar ke WhatsApp/emel anda tidak lama lagi.',
+      backLink: '← Lihat semula keputusan saya',
+      demoNote: '(Demo — tiada mesej sebenar dihantar)',
+    },
+    bridge: { johor:'Johor', singapura:'Singapura', step:'Langkah {step} / {total}' },
+  },
 
-    pillarResults: [],
-    weakestPillar: { key:'commute', label:'', message:'', consequence:'', atRisk:0, total:0, level:'ok' },
+  en: {
+    demoFlag: 'STATIC DEMO — NO DATA IS SENT OR STORED',
+    footerNote: 'PERKESO Johor · Your Voice, Our Scheme · Internal Demo',
+    profileTag: 'Almost there',
+    backBtn: 'Back',
+    hook: {
+      eyebrow: 'Your Voice, Our Scheme',
+      headline: "You work in Singapore. But... in an emergency, who's there for you?",
+      sub: 'Every day you cross the Causeway to earn a living. PERKESO wants to know — where are the gaps in your safety and health protection, and how can we help?',
+      cta: 'Start the 2-Minute Quiz',
+      caption: 'PERKESO Johor Engagement Session · 18 October 2026',
+    },
+    info: {
+      heading: 'Just a few basic details',
+      sub: "We use this to register you for the 18 October session or send you your quiz summary. No other marketing purpose.",
+      labelNama: 'Name / Nickname',
+      placeholderNama: 'Your name',
+      labelWhatsapp: 'WhatsApp Number',
+      hintWhatsapp: 'To receive your score summary.',
+      labelEmel: 'Email (optional)',
+      placeholderEmel: 'name@email.com',
+      hintEmel: 'If you choose to receive your summary by email.',
+      labelKawasan: 'Area of Residence in Johor',
+      kawasanPlaceholder: 'Select area',
+      kawasanOptions: [
+        {value:'JB', label:'Johor Bahru'},
+        {value:'Kulai', label:'Kulai'},
+        {value:'Iskandar Puteri', label:'Iskandar Puteri'},
+        {value:'Pasir Gudang', label:'Pasir Gudang'},
+        {value:'Lain-lain', label:'Other'},
+      ],
+      hintKawasan: 'This data is simulated only in this demo — nothing is sent to any server.',
+      continueBtn: 'Continue',
+    },
+    scoreOptions: [
+      { label:'Yes', value:0 },
+      { label:'Not sure', value:0.5 },
+      { label:'No', value:1 },
+    ],
+    questions: {
+      c1: 'Daily Commute: Do you have a comfortable time plan and mode of travel for your weekly back-and-forth across the Causeway/Second Link?',
+      c2: 'Roadside Emergency: If your vehicle or transport breaks down on the border route, do you have a reliable emergency support network in Johor?',
+      c3: "Rest & Recovery: If you need sick leave or leave for medical treatment (e.g. a few weeks' MC), does your monthly income stay unaffected?",
+      f1: "Sole Breadwinner: Is the money you earn in Singapore now the main support for your family's expenses (children, spouse, or parents)?",
+      f2: 'Malaysia Safety Net: Besides regular bank savings, do you have any official welfare fund in Malaysia that acts as an "emergency umbrella"?',
+      f3: 'Continuity of Livelihood: If an unexpected accident or injury occurs, do you have a support network that can provide ongoing physical rehabilitation and regular living support for your family?',
+      r1: "Fair Compensation: Do you know the welfare rights and compensation you're entitled to if something goes wrong while on duty?",
+      r2: 'Facilities: Would you be interested if Malaysia provided an easily accessible support or treatment centre for cross-border workers?',
+      r3: 'Future of the Sector: Do you agree that Malaysian workers in Singapore deserve an official, internationally-recognised welfare scheme backed by the government?',
+      r4: 'A Chance to Be Heard: Do you want your real views and experiences taken into account when shaping support policies for workers like you?',
+    },
+    profileQuestions: {
+      tempoh: { text:'How long have you been working in Singapore?', options:{
+        '<1':'Less than 1 year (Still adjusting)', '1-5':'1 – 5 years (Settled)', '>5':'More than 5 years (Highly experienced)' } },
+      moda: { text:'Your main mode of travel:', options:{
+        motosikal:'Motorcycle', bas:'Public Bus / Factory Bus', kereta:'Own Car / Rental Car', jalan_rts:'Walking / Train (RTS/KTM)' } },
+      impian: { text:'What is your biggest dream/priority for the next 3 years?', options:{
+        aset_rumah:'Building assets/a home in Johor with peace of mind', pendidikan_anak:"Securing your children's education",
+        modal_perniagaan:'Saving capital to start a business back home', jaminan_kebajikan:'Getting welfare protection equal to workers in Malaysia' } },
+      topik: { text:'Which topic would be most useful for you to discuss with the authorities?', options:{
+        rawatan_perubatan:'Medical treatment facilities & panel clinics in Johor', bantuan_kewangan:'Emergency financial aid scheme for loss of income',
+        persaraan_simpanan:'Retirement plans and future savings', pasport_permit:'Passport, permit, and border-crossing issues' } },
+      hadir: { text:'Attendance Option for the Special Engagement Session (Sunday, 18 October 2026):', options:{
+        pagi:'Attend the Morning Session (9:00am – 1:00pm) — Free Entry, Breakfast, Lunch & Souvenir Provided',
+        jauh:"Can't attend in person, but would like to receive a summary via WhatsApp/Email" } },
+    },
+    pillarLabels: {
+      commute: 'Commute Routine & Wellbeing',
+      financial: 'Family & Savings Stability Back Home',
+      rights: 'Rights & Voice of Overseas Workers',
+    },
+    pillarShortLabels: { commute:'commute', financial:'family finances', rights:'worker rights' },
+    pillarMessages: {
+      commute: "Your daily commute across the Causeway/Second Link appears to carry risks that aren't fully covered yet — from roadside emergencies to income pressure during medical leave.",
+      financial: 'Your savings stability and family safety net back home may not be enough if an accident or sudden loss of income happens.',
+      rights: "You may be unsure of your welfare rights and compensation, or feel your voice hasn't been considered in support policies for cross-border workers.",
+    },
+    pillarConsequences: {
+      commute: 'If an emergency happens at the border tomorrow, you might be handling it alone.',
+      financial: 'If your Singapore income stops for even a month, your family in Malaysia feels it too.',
+      rights: "You might not know your real rights until it's too late to claim them.",
+    },
+    topikLabels: {
+      rawatan_perubatan: 'medical treatment facilities & panel clinics in Johor',
+      bantuan_kewangan: 'emergency financial aid scheme for loss of income',
+      persaraan_simpanan: 'retirement plans and future savings',
+      pasport_permit: 'passport, permit, and border-crossing issues',
+    },
+    result: {
+      eyebrow: 'Your Result',
+      defaultName: 'Friend',
+      headingSuffix: "{name}, here's your protection gap",
+      heroFraction: '{atRisk} out of {total} questions show a gap here',
+      breakdownLabel: 'Breakdown by pillar',
+      pctTemplate: '{pct}% gap',
+      topikTieIn: 'This lines up with the topic you picked earlier — {topik} — which will be one of the key focuses of the 18 October session.',
+      ctaAttend: 'Get Answers About {topic} — Register for 18 Oct',
+      ctaRemote: 'Send My {topic} Summary to WhatsApp/Email',
+      reassurance: 'Free · Breakfast & lunch provided for the morning session',
+    },
+    confirm: {
+      headingPagi: 'Your registration is confirmed!',
+      headingJauh: 'Your summary is being prepared!',
+      bodyPagi: "Thank you, {nama}. Your spot for the Morning Session (9:00am – 1:00pm) on 18 October 2026 in Johor has been recorded — free entry, breakfast, lunch & souvenir provided. We'll contact you via WhatsApp with further details.",
+      bodyJauh: 'Thank you, {nama}. Your quiz summary and scheme information will be sent to your WhatsApp/email shortly.',
+      backLink: '← View my result again',
+      demoNote: '(Demo — no real message is sent)',
+    },
+    bridge: { johor:'Johor', singapura:'Singapore', step:'Step {step} / {total}' },
+  },
+
+  zh: {
+    demoFlag: '静态示范版本 — 不会发送或储存任何资料',
+    footerNote: 'PERKESO 柔佛 · 您的心声，我们的保障 · 内部示范',
+    profileTag: '快完成了',
+    backBtn: '返回',
+    hook: {
+      eyebrow: '您的心声，我们的保障',
+      headline: '在新加坡工作，但……万一发生紧急状况，谁来负责？',
+      sub: '您每天跨越长堤讨生活。PERKESO 想知道——您在安全与健康保障方面还有哪些缺口，我们可以如何协助？',
+      cta: '开始 2 分钟测验',
+      caption: 'PERKESO 柔佛互动交流会 · 2026年10月18日',
+    },
+    info: {
+      heading: '只需填写基本资料',
+      sub: '这些资料将用于为您登记10月18日的交流会，或发送测验结果摘要给您。绝不用于其他推广用途。',
+      labelNama: '姓名 / 昵称',
+      placeholderNama: '您的姓名',
+      labelWhatsapp: 'WhatsApp 号码',
+      hintWhatsapp: '用于接收您的分数摘要。',
+      labelEmel: '电邮（选填）',
+      placeholderEmel: 'name@email.com',
+      hintEmel: '若您选择以电邮方式接收摘要。',
+      labelKawasan: '您在柔佛的居住地区',
+      kawasanPlaceholder: '请选择地区',
+      kawasanOptions: [
+        {value:'JB', label:'新山'},
+        {value:'Kulai', label:'古来'},
+        {value:'Iskandar Puteri', label:'依斯干达公主城'},
+        {value:'Pasir Gudang', label:'巴西古当'},
+        {value:'Lain-lain', label:'其他'},
+      ],
+      hintKawasan: '此示范版本中的资料仅作模拟用途——不会传送至任何服务器。',
+      continueBtn: '继续',
+    },
+    scoreOptions: [
+      { label:'是', value:0 },
+      { label:'不确定', value:0.5 },
+      { label:'否', value:1 },
+    ],
+    questions: {
+      c1: '每日通勤：您是否已为每周往返长堤/第二通道安排好舒适的时间与交通方式？',
+      c2: '路上突发状况：若您的交通工具在边境路段抛锚，您在柔佛是否有可靠的紧急支援网络？',
+      c3: '休养与恢复：若您需要病假或接受医疗的假期（例如数周MC），您的月收入是否仍不受影响？',
+      f1: '家庭经济支柱：您在新加坡辛苦赚取的收入，目前是否是家人（子女、配偶或父母）生活开销的主要来源？',
+      f2: '马来西亚安全网：除了一般银行储蓄，您是否在马来西亚拥有任何可作为「应急保护伞」的官方福利基金？',
+      f3: '持续生计保障：若不幸发生意外或受伤，您是否有正式的支援网络，能持续提供身体复健治疗及定期生活援助给您的家人？',
+      r1: '公平赔偿：若在值勤期间发生任何意外，您是否了解自己应得的福利权益与赔偿？',
+      r2: '配套设施：若马来西亚为跨境工作者提供便利可及的支援或医疗中心，您是否感兴趣？',
+      r3: '行业未来：您是否认同，在新加坡工作的马来西亚员工应享有获政府认可、达国际水平的正式福利计划？',
+      r4: '发声机会：您是否希望自己真实的想法与经历，能被纳入为您这样的工作者制定援助政策的考量？',
+    },
+    profileQuestions: {
+      tempoh: { text:'您在新加坡工作多久了？', options:{
+        '<1':'少过1年（仍在适应）', '1-5':'1至5年（已稳定）', '>5':'超过5年（经验丰富）' } },
+      moda: { text:'您主要的通勤方式：', options:{
+        motosikal:'摩托车', bas:'公共巴士 / 工厂巴士', kereta:'自驾车 / 租车', jalan_rts:'步行 / 火车（RTS/KTM）' } },
+      impian: { text:'未来3年，您最大的目标或愿望是什么？', options:{
+        aset_rumah:'在柔佛安心置产/建屋', pendidikan_anak:'确保孩子未来教育无忧',
+        modal_perniagaan:'累积资本回乡创业', jaminan_kebajikan:'获得与马来西亚员工同等的福利保障' } },
+      topik: { text:'您认为哪个课题最值得与有关当局讨论？', options:{
+        rawatan_perubatan:'柔佛的医疗设施与门诊医疗中心', bantuan_kewangan:'失去收入来源时的紧急经济援助计划',
+        persaraan_simpanan:'退休计划与未来储蓄', pasport_permit:'护照、准证与通关顺畅课题' } },
+      hadir: { text:'特别交流会出席方式（2026年10月18日，星期日）：', options:{
+        pagi:'出席早场（上午9时至下午1时）——免费入场，提供早餐、午餐与纪念品',
+        jauh:'无法亲自出席，但希望透过WhatsApp/电邮收到摘要' } },
+    },
+    pillarLabels: {
+      commute: '通勤日常与身心健康',
+      financial: '家乡储蓄与家庭稳定',
+      rights: '海外工作者的权益与心声',
+    },
+    pillarShortLabels: { commute:'通勤', financial:'家庭经济', rights:'劳工权益' },
+    pillarMessages: {
+      commute: '您跨越长堤/第二通道的日常通勤，似乎存在尚未完全应对的风险——从路上紧急状况，到病假期间的收入压力。',
+      financial: '您在家乡的储蓄稳定性与家庭安全网，可能不足以应付突发意外或收入骤减的情况。',
+      rights: '您可能还不清楚自己的福利权益与赔偿，或觉得自己的心声尚未被纳入跨境工作者的支援政策中。',
+    },
+    pillarConsequences: {
+      commute: '若明天在边境发生紧急状况，您可能得独自面对。',
+      financial: '只要新加坡的收入中断一个月，您在马来西亚的家人也会受到影响。',
+      rights: '您可能要等到为时已晚，才发现自己不了解真正的权益。',
+    },
+    topikLabels: {
+      rawatan_perubatan: '柔佛的医疗设施与门诊医疗中心',
+      bantuan_kewangan: '失去收入来源时的紧急经济援助计划',
+      persaraan_simpanan: '退休计划与未来储蓄',
+      pasport_permit: '护照、准证与通关顺畅课题',
+    },
+    result: {
+      eyebrow: '您的测验结果',
+      defaultName: '朋友',
+      headingSuffix: '{name}，这是您的保障缺口',
+      heroFraction: '{total} 题中有 {atRisk} 题显示此处存在缺口',
+      breakdownLabel: '各项分类明细',
+      pctTemplate: '{pct}% 缺口',
+      topikTieIn: '这与您刚才选择的课题——{topik}——相符，这也将是10月18日交流会的重点之一。',
+      ctaAttend: '了解关于{topic}的解答 — 报名10月18日',
+      ctaRemote: '将我的{topic}摘要发送至WhatsApp/电邮',
+      reassurance: '免费 · 早场提供早餐与午餐',
+    },
+    confirm: {
+      headingPagi: '您的报名已确认！',
+      headingJauh: '摘要正在准备中！',
+      bodyPagi: '谢谢您，{nama}。您在2026年10月18日柔佛早场（上午9时至下午1时）的名额已记录——免费入场，提供早餐、午餐与纪念品。我们将透过WhatsApp联系您以告知详情。',
+      bodyJauh: '谢谢您，{nama}。测验摘要与计划资讯将很快发送至您的WhatsApp/电邮。',
+      backLink: '← 重新查看我的结果',
+      demoNote: '（示范版本 — 不会发送真实讯息）',
+    },
+    bridge: { johor:'柔佛', singapura:'新加坡', step:'步骤 {step} / {total}' },
+  },
+
+  ta: {
+    demoFlag: 'நிலையான டெமோ — தரவு எதுவும் அனுப்பப்படவில்லை அல்லது சேமிக்கப்படவில்லை',
+    footerNote: 'PERKESO ஜொகூர் · உங்கள் குரல், எங்கள் திட்டம் · உள் டெமோ',
+    profileTag: 'இன்னும் கொஞ்சம்',
+    backBtn: 'பின்செல்',
+    hook: {
+      eyebrow: 'உங்கள் குரல், எங்கள் திட்டம்',
+      headline: 'சிங்கப்பூரில் வேலை. ஆனால்... அவசரநிலை ஏற்பட்டால், யார் பொறுப்பு?',
+      sub: 'ஒவ்வொரு நாளும் நீங்கள் வாழ்வாதாரத்திற்காக காஸ்வேயை கடக்கிறீர்கள். உங்கள் பாதுகாப்பு/சுகாதார பாதுகாப்பில் உள்ள இடைவெளி எங்கே, நாங்கள் எப்படி உதவ முடியும் என்பதை PERKESO அறிய விரும்புகிறது.',
+      cta: '2 நிமிட வினாடி வினாவைத் தொடங்கு',
+      caption: 'PERKESO ஜொகூர் ஈடுபாட்டு அமர்வு · 18 அக்டோபர் 2026',
+    },
+    info: {
+      heading: 'உங்கள் அடிப்படை விவரங்கள் சிலவற்றை மட்டும்',
+      sub: '18 அக்டோபர் அமர்விற்கு உங்களைப் பதிவு செய்யவோ அல்லது வினாடி வினா முடிவுகளின் சுருக்கத்தை அனுப்பவோ இந்தத் தகவலைப் பயன்படுத்துகிறோம். வேறு எந்த சந்தைப்படுத்தல் நோக்கமும் இல்லை.',
+      labelNama: 'பெயர் / செல்லப்பெயர்',
+      placeholderNama: 'உங்கள் பெயர்',
+      labelWhatsapp: 'WhatsApp எண்',
+      hintWhatsapp: 'உங்கள் மதிப்பெண் சுருக்கத்தைப் பெற.',
+      labelEmel: 'மின்னஞ்சல் (விருப்பத்தேர்வு)',
+      placeholderEmel: 'name@email.com',
+      hintEmel: 'மின்னஞ்சல் மூலம் சுருக்கத்தைப் பெற விரும்பினால்.',
+      labelKawasan: 'ஜொகூரில் நீங்கள் வசிக்கும் பகுதி',
+      kawasanPlaceholder: 'பகுதியைத் தேர்ந்தெடுக்கவும்',
+      kawasanOptions: [
+        {value:'JB', label:'ஜொகூர் பாரு'},
+        {value:'Kulai', label:'குலாய்'},
+        {value:'Iskandar Puteri', label:'இஸ்கந்தர் புத்திரி'},
+        {value:'Pasir Gudang', label:'பசீர் குடாங்'},
+        {value:'Lain-lain', label:'மற்றவை'},
+      ],
+      hintKawasan: 'இந்த டெமோவில் இந்தத் தரவு உருவகப்படுத்தப்பட்டது மட்டுமே — எந்த சர்வருக்கும் அனுப்பப்படாது.',
+      continueBtn: 'தொடரவும்',
+    },
+    scoreOptions: [
+      { label:'ஆம்', value:0 },
+      { label:'உறுதியாகத் தெரியவில்லை', value:0.5 },
+      { label:'இல்லை', value:1 },
+    ],
+    questions: {
+      c1: 'தினசரி பயணம்: காஸ்வே/இரண்டாம் இணைப்பை வாரந்தோறும் கடப்பதற்கு வசதியான நேர திட்டமும் பயண முறையும் உங்களிடம் உள்ளதா?',
+      c2: 'சாலை அவசரநிலை: எல்லைப் பாதையில் உங்கள் வாகனம் அல்லது போக்குவரத்து பழுதடைந்தால், ஜொகூரில் நம்பகமான உடனடி உதவி வலையமைப்பு உங்களிடம் உள்ளதா?',
+      c3: 'ஓய்வும் மீட்சியும்: நீங்கள் மருத்துவ விடுப்பு எடுக்க வேண்டியிருந்தால் (எ.கா. சில வாரங்கள் MC), உங்கள் மாத வருமானம் பாதிக்கப்படாமல் இருக்குமா?',
+      f1: 'முதன்மை உழைப்பாளி: சிங்கப்பூரில் நீங்கள் சம்பாதிக்கும் வருமானம் இப்போது உங்கள் குடும்பச் செலவுகளுக்கு (பிள்ளைகள், துணைவர், பெற்றோர்) முதன்மை ஆதாரமாக உள்ளதா?',
+      f2: 'மலேசிய பாதுகாப்பு வலையமைப்பு: வழக்கமான வங்கி சேமிப்புக்கு கூடுதலாக, "அவசரகால குடை" போல செயல்படும் அதிகாரப்பூர்வ நல நிதி மலேசியாவில் உங்களிடம் உள்ளதா?',
+      f3: 'வாழ்வாதார தொடர்ச்சி: எதிர்பாராத விபத்து அல்லது காயம் ஏற்பட்டால், தொடர்ச்சியான உடல் மீட்சி சிகிச்சையையும் உங்கள் குடும்பத்திற்கு அவ்வப்போது வாழ்வாதார உதவியையும் வழங்கக்கூடிய அதிகாரப்பூர்வ ஆதரவு வலையமைப்பு உங்களிடம் உள்ளதா?',
+      r1: 'நியாயமான இழப்பீடு: பணியின் போது ஏதேனும் சிக்கல் ஏற்பட்டால், நீங்கள் பெற வேண்டிய நல உரிமைகள் மற்றும் இழப்பீடு பற்றி உங்களுக்குத் தெரியுமா?',
+      r2: 'வசதிகள்: எல்லை கடந்து பணிபுரியும் தொழிலாளர்களுக்கு எளிதில் அணுகக்கூடிய ஆதரவு அல்லது சிகிச்சை மையத்தை மலேசியா வழங்கினால், நீங்கள் ஆர்வமாக இருப்பீர்களா?',
+      r3: 'துறையின் எதிர்காலம்: சிங்கப்பூரில் பணிபுரியும் மலேசிய தொழிலாளர்களுக்கு அரசு அங்கீகரித்த, சர்வதேச தரத்திலான அதிகாரப்பூர்வ நல திட்டம் இருக்க வேண்டும் என்று நீங்கள் ஒப்புக்கொள்கிறீர்களா?',
+      r4: 'குரல் கொடுக்கும் வாய்ப்பு: உங்களைப் போன்ற தொழிலாளர்களுக்கான உதவிக் கொள்கைகளை வடிவமைக்கும்போது, உங்கள் உண்மையான கருத்துகளும் அனுபவங்களும் கருத்தில் கொள்ளப்பட வேண்டும் என்று விரும்புகிறீர்களா?',
+    },
+    profileQuestions: {
+      tempoh: { text:'நீங்கள் சிங்கப்பூரில் எவ்வளவு காலமாக பணிபுரிகிறீர்கள்?', options:{
+        '<1':'1 வருடத்திற்கும் குறைவாக (இன்னும் பழகி வருகிறேன்)', '1-5':'1–5 ஆண்டுகள் (நிலையானது)', '>5':'5 ஆண்டுகளுக்கு மேல் (அதிக அனுபவம்)' } },
+      moda: { text:'உங்கள் முதன்மை பயண முறை:', options:{
+        motosikal:'மோட்டார் சைக்கிள்', bas:'பொது பேருந்து / தொழிற்சாலை பேருந்து', kereta:'சொந்த கார் / வாடகை கார்', jalan_rts:'நடைபயணம் / ரயில் (RTS/KTM)' } },
+      impian: { text:'அடுத்த 3 ஆண்டுகளில் உங்கள் மிகப்பெரிய கனவு/முன்னுரிமை என்ன?', options:{
+        aset_rumah:'ஜொகூரில் அமைதியாக சொத்து/வீடு கட்டுவது', pendidikan_anak:'பிள்ளைகளின் கல்வி எதிர்காலத்தை உறுதி செய்வது',
+        modal_perniagaan:'சொந்த நாட்டில் வணிகம் தொடங்க மூலதனம் சேர்ப்பது', jaminan_kebajikan:'மலேசியாவில் உள்ள தொழிலாளர்களுக்கு இணையான நல உத்தரவாதம் பெறுவது' } },
+      topik: { text:'அதிகாரிகளுடன் விவாதிக்க மிகவும் பயனுள்ள தலைப்பு எது?', options:{
+        rawatan_perubatan:'ஜொகூரில் மருத்துவ சிகிச்சை வசதிகள் & பேனல் கிளினிக்குகள்', bantuan_kewangan:'வருமான இழப்பிற்கான அவசர நிதி உதவித் திட்டம்',
+        persaraan_simpanan:'ஓய்வூதிய திட்டங்களும் எதிர்கால சேமிப்பும்', pasport_permit:'பாஸ்போர்ட், அனுமதி, மற்றும் எல்லை கடத்தல் தொடர்பான பிரச்சினைகள்' } },
+      hadir: { text:'சிறப்பு ஈடுபாட்டு அமர்வுக்கான வருகை விருப்பம் (ஞாயிறு, 18 அக்டோபர் 2026):', options:{
+        pagi:'காலை அமர்வில் கலந்துகொள்ளுங்கள் (காலை 9.00 – மதியம் 1.00) — இலவச நுழைவு, காலை உணவு, மதிய உணவு & நினைவுப் பரிசு வழங்கப்படும்',
+        jauh:'நேரில் வர முடியாது, ஆனால் WhatsApp/மின்னஞ்சல் மூலம் சுருக்கத்தைப் பெற விரும்புகிறேன்' } },
+    },
+    pillarLabels: {
+      commute: 'பயண வழக்கமும் நல்வாழ்வும்',
+      financial: 'சொந்த நாட்டில் சேமிப்பு மற்றும் குடும்ப நிலைத்தன்மை',
+      rights: 'வெளிநாட்டு தொழிலாளர் உரிமைகளும் குரலும்',
+    },
+    pillarShortLabels: { commute:'பயணம்', financial:'குடும்ப நிதி', rights:'தொழிலாளர் உரிமைகள்' },
+    pillarMessages: {
+      commute: 'காஸ்வே/இரண்டாம் இணைப்பு வழியான உங்கள் தினசரி பயணத்தில், சாலை அவசரநிலைகள் முதல் மருத்துவ விடுப்பு காலத்தில் வருமான அழுத்தம் வரை முழுமையாக சமாளிக்கப்படாத அபாயங்கள் இருப்பதாகத் தெரிகிறது.',
+      financial: 'விபத்து அல்லது திடீர் வருமான இழப்பு ஏற்பட்டால், சொந்த நாட்டில் உங்கள் சேமிப்பு நிலைத்தன்மையும் குடும்ப பாதுகாப்பு வலையமைப்பும் போதுமானதாக இல்லாமல் இருக்கலாம்.',
+      rights: 'உங்கள் நல உரிமைகள் மற்றும் இழப்பீடு பற்றி உங்களுக்கு உறுதியாகத் தெரியாமல் இருக்கலாம், அல்லது எல்லை கடந்த தொழிலாளர் ஆதரவுக் கொள்கைகளில் உங்கள் குரல் கருத்தில் கொள்ளப்படவில்லை என்று நீங்கள் உணரலாம்.',
+    },
+    pillarConsequences: {
+      commute: 'நாளை எல்லையில் அவசரநிலை ஏற்பட்டால், நீங்கள் தனியாக அதைச் சமாளிக்க வேண்டியிருக்கலாம்.',
+      financial: 'சிங்கப்பூர் வருமானம் ஒரு மாதம் நின்றாலும், மலேசியாவில் உள்ள உங்கள் குடும்பமும் பாதிக்கப்படும்.',
+      rights: 'உங்கள் உண்மையான உரிமைகளை கோர காலம் கடந்துவிடும் வரை, அவற்றை நீங்கள் அறியாமல் இருக்கலாம்.',
+    },
+    topikLabels: {
+      rawatan_perubatan: 'ஜொகூரில் மருத்துவ சிகிச்சை வசதிகள் & பேனல் கிளினிக்குகள்',
+      bantuan_kewangan: 'வருமான இழப்பிற்கான அவசர நிதி உதவித் திட்டம்',
+      persaraan_simpanan: 'ஓய்வூதிய திட்டங்களும் எதிர்கால சேமிப்பும்',
+      pasport_permit: 'பாஸ்போர்ட், அனுமதி, மற்றும் எல்லை கடத்தல் தொடர்பான பிரச்சினைகள்',
+    },
+    result: {
+      eyebrow: 'உங்கள் முடிவு',
+      defaultName: 'நண்பரே',
+      headingSuffix: '{name}, இது உங்கள் பாதுகாப்பு இடைவெளி',
+      heroFraction: '{total} கேள்விகளில் {atRisk} இங்கு ஒரு இடைவெளியைக் காட்டுகின்றன',
+      breakdownLabel: 'தூணின்படி பிரிவு',
+      pctTemplate: '{pct}% இடைவெளி',
+      topikTieIn: 'இது நீங்கள் முன்னர் தேர்ந்தெடுத்த தலைப்புடன் — {topik} — ஒத்துப்போகிறது — இது 18 அக்டோபர் அமர்வின் முக்கிய கவனங்களில் ஒன்றாக இருக்கும்.',
+      ctaAttend: '{topic} பற்றிய பதில்களைப் பெறுங்கள் — 18 அக்டோபர் பதிவு செய்யவும்',
+      ctaRemote: 'எனது {topic} சுருக்கத்தை WhatsApp/மின்னஞ்சலுக்கு அனுப்பவும்',
+      reassurance: 'இலவசம் · காலை அமர்விற்கு காலை & மதிய உணவு வழங்கப்படும்',
+    },
+    confirm: {
+      headingPagi: 'உங்கள் பதிவு உறுதி செய்யப்பட்டது!',
+      headingJauh: 'சுருக்கம் தயாரிக்கப்பட்டு வருகிறது!',
+      bodyPagi: 'நன்றி, {nama}. 18 அக்டோபர் 2026 ஜொகூரில் நடைபெறும் காலை அமர்விற்கான (காலை 9.00 – மதியம் 1.00) உங்கள் இடம் பதிவு செய்யப்பட்டுள்ளது — இலவச நுழைவு, காலை உணவு, மதிய உணவு & நினைவுப் பரிசு வழங்கப்படும். மேலும் விவரங்களுக்கு நாங்கள் WhatsApp மூலம் உங்களைத் தொடர்பு கொள்வோம்.',
+      bodyJauh: 'நன்றி, {nama}. வினாடி வினா சுருக்கமும் திட்ட தகவலும் விரைவில் உங்கள் WhatsApp/மின்னஞ்சலுக்கு அனுப்பப்படும்.',
+      backLink: '← எனது முடிவை மீண்டும் பார்க்கவும்',
+      demoNote: '(டெமோ — உண்மையான செய்தி எதுவும் அனுப்பப்படவில்லை)',
+    },
+    bridge: { johor:'ஜொகூர்', singapura:'சிங்கப்பூர்', step:'படி {step} / {total}' },
+  },
+};
+
+function quizApp(){
+  return {
+    screen: 'hook',
+    ref: null,
+    utm_source: null,
+
+    lang: 'ms',
+    langOptions: [
+      {code:'ms', label:'BM'},
+      {code:'en', label:'EN'},
+      {code:'zh', label:'中文'},
+      {code:'ta', label:'தமிழ்'},
+    ],
+
+    info: { nama:'', whatsapp:'', emel:'', kawasan:'' },
+    quizIndex: 0,
+    profileIndex: 0,
+    answers: {},
+    profile: {},
+
+    questionMeta: [
+      { id:'c1', pillar:'commute' }, { id:'c2', pillar:'commute' }, { id:'c3', pillar:'commute' },
+      { id:'f1', pillar:'financial' }, { id:'f2', pillar:'financial' }, { id:'f3', pillar:'financial' },
+      { id:'r1', pillar:'rights' }, { id:'r2', pillar:'rights' }, { id:'r3', pillar:'rights' }, { id:'r4', pillar:'rights' },
+    ],
+    profileMeta: [
+      { id:'tempoh', options:['<1','1-5','>5'] },
+      { id:'moda', options:['motosikal','bas','kereta','jalan_rts'] },
+      { id:'impian', options:['aset_rumah','pendidikan_anak','modal_perniagaan','jaminan_kebajikan'] },
+      { id:'topik', options:['rawatan_perubatan','bantuan_kewangan','persaraan_simpanan','pasport_permit'] },
+      { id:'hadir', options:['pagi','jauh'] },
+    ],
+
+    weakestPillarKey: 'commute',
     heroDisplayPct: 0,
 
     init(){
       const params = new URLSearchParams(window.location.search);
       this.ref = params.get('ref');
       this.utm_source = params.get('utm_source');
+      this.$watch('lang', (v) => { document.documentElement.lang = v; });
     },
 
-    get totalSteps(){ return 1 + this.scoredQuestions.length + this.profileQuestions.length; },
+    get T(){ return translations[this.lang] || translations.ms; },
+
+    fmt(str, vars){
+      return str.replace(/\{(\w+)\}/g, (m, k) => (vars[k] !== undefined ? vars[k] : m));
+    },
+
+    get totalSteps(){ return 1 + this.questionMeta.length + this.profileMeta.length; },
     get infoValid(){ return this.info.nama.trim().length > 0 && this.info.whatsapp.trim().length > 0 && this.info.kawasan.trim().length > 0; },
-    get currentQuestion(){ return this.scoredQuestions[this.quizIndex]; },
-    get currentProfileQ(){ return this.profileQuestions[this.profileIndex]; },
+
+    get currentQuestion(){
+      const meta = this.questionMeta[this.quizIndex];
+      return { id: meta.id, pillar: meta.pillar, pillarLabel: this.T.pillarLabels[meta.pillar], text: this.T.questions[meta.id] };
+    },
+    get currentProfileQ(){
+      const meta = this.profileMeta[this.profileIndex];
+      const tq = this.T.profileQuestions[meta.id];
+      return { id: meta.id, text: tq.text, options: meta.options.map(v => ({ value: v, label: tq.options[v] })) };
+    },
+
+    get pillarResults(){
+      const pillars = ['commute','financial','rights'];
+      return pillars.map(key => {
+        const qs = this.questionMeta.filter(q => q.pillar === key);
+        const sum = qs.reduce((acc,q) => acc + (this.answers[q.id] || 0), 0);
+        const pct = (sum / qs.length) * 100;
+        const atRisk = qs.filter(q => (this.answers[q.id] || 0) > 0).length;
+        let level = 'ok';
+        if(pct >= 60) level = 'danger';
+        else if(pct >= 30) level = 'warn';
+        return { key, label: this.T.pillarLabels[key], pct, level, atRisk, total: qs.length };
+      });
+    },
+
+    get weakestPillar(){
+      const key = this.weakestPillarKey;
+      const stats = this.pillarResults.find(p => p.key === key) || { pct:0, atRisk:0, total:0, level:'ok', label:'' };
+      const topikLabel = this.T.topikLabels[this.profile.topik];
+      let message = this.T.pillarMessages[key];
+      if(topikLabel){
+        message += ' ' + this.fmt(this.T.result.topikTieIn, { topik: topikLabel });
+      }
+      return {
+        key,
+        label: stats.label,
+        level: stats.level,
+        pct: stats.pct,
+        atRisk: stats.atRisk,
+        total: stats.total,
+        consequence: this.T.pillarConsequences[key],
+        message,
+      };
+    },
+
     get ctaLabel(){
-      const topic = this.pillarShortLabels[this.weakestPillar.key] || '';
-      return this.profile.hadir === 'pagi'
-        ? `Dapatkan Jawapan Tentang ${topic} — Daftar 18 Okt`
-        : `Hantar Ringkasan ${topic ? 'Tentang ' + topic + ' ' : ''}ke WhatsApp/E-mel Saya`;
+      const topic = this.T.pillarShortLabels[this.weakestPillarKey] || '';
+      const tpl = this.profile.hadir === 'pagi' ? this.T.result.ctaAttend : this.T.result.ctaRemote;
+      return this.fmt(tpl, { topic });
     },
 
     bridgeHtml(step, total){
       const pct = Math.min(100, Math.max(0, (step/total)*100));
       const leftPct = 8 + (pct/100)*84;
+      const b = this.T.bridge;
       return `
-        <div class="bridge-meta"><span>Johor</span><span>Langkah ${step} / ${total}</span><span>Singapura</span></div>
+        <div class="bridge-meta"><span>${b.johor}</span><span>${this.fmt(b.step, {step, total})}</span><span>${b.singapura}</span></div>
         <div class="bridge">
           <div class="bridge-sky"></div>
           <div class="bridge-city jb">🏍️🏠</div>
@@ -531,7 +987,7 @@ function quizApp(){
     pillarSceneHtml(pillar){
       if(pillar === 'commute'){
         return `
-        <svg viewBox="0 0 480 140" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Ilustrasi jambatan dan trafik perjalanan harian">
+        <svg viewBox="0 0 480 140" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Illustration of a bridge and daily commute traffic">
           <circle cx="400" cy="115" r="26" fill="#EF9F27" opacity="0.35"/>
           <rect x="0" y="108" width="480" height="32" fill="#0B2F5C" opacity="0.08"/>
           <g fill="#0B2F5C" opacity="0.85">
@@ -560,7 +1016,7 @@ function quizApp(){
       }
       if(pillar === 'financial'){
         return `
-        <svg viewBox="0 0 480 140" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Ilustrasi rumah, keluarga dan perlindungan kewangan">
+        <svg viewBox="0 0 480 140" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Illustration of a home, family, and financial protection">
           <g fill="#0B2F5C">
             <polygon points="90,55 60,80 120,80"/>
             <rect x="68" y="80" width="44" height="35"/>
@@ -583,7 +1039,7 @@ function quizApp(){
         </svg>`;
       }
       return `
-        <svg viewBox="0 0 480 140" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Ilustrasi suara dan hak pekerja">
+        <svg viewBox="0 0 480 140" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Illustration of worker voice and rights">
           <g fill="#0B2F5C">
             <path d="M60 90 L110 70 L110 110 L60 100 Z"/>
             <rect x="45" y="88" width="16" height="14" rx="3"/>
@@ -609,7 +1065,7 @@ function quizApp(){
 
     profileSceneHtml(){
       return `
-        <svg viewBox="0 0 480 140" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Ilustrasi laluan peribadi dan sesi 18 Oktober">
+        <svg viewBox="0 0 480 140" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Illustration of a personal route and the 18 October session">
           <path d="M40 100 Q140 40 240 90 T430 60" stroke="#0B2F5C" stroke-width="2.5" stroke-dasharray="6 8" fill="none" opacity="0.55"/>
           <circle cx="40" cy="100" r="7" fill="#1D9E75"/>
           <g fill="#0B2F5C">
@@ -654,7 +1110,7 @@ function quizApp(){
     },
 
     nextQuizStep(){
-      if(this.quizIndex < this.scoredQuestions.length - 1){
+      if(this.quizIndex < this.questionMeta.length - 1){
         this.quizIndex++;
       } else {
         this.screen = 'profile';
@@ -671,11 +1127,10 @@ function quizApp(){
     },
 
     nextProfileStep(){
-      if(this.profileIndex < this.profileQuestions.length - 1){
+      if(this.profileIndex < this.profileMeta.length - 1){
         this.profileIndex++;
       } else {
-        this.computeResults();
-        this.screen = 'result';
+        this.finishQuiz();
       }
     },
     prevProfileStep(){
@@ -683,39 +1138,16 @@ function quizApp(){
       this.advancing = true;
       this.transitionTo(() => {
         if(this.profileIndex > 0){ this.profileIndex--; }
-        else { this.screen = 'quiz'; this.quizIndex = this.scoredQuestions.length - 1; }
+        else { this.screen = 'quiz'; this.quizIndex = this.questionMeta.length - 1; }
       });
     },
 
-    computeResults(){
-      const pillars = ['commute','financial','rights'];
-      this.pillarResults = pillars.map(key => {
-        const qs = this.scoredQuestions.filter(q => q.pillar === key);
-        const sum = qs.reduce((acc,q) => acc + (this.answers[q.id] || 0), 0);
-        const pct = (sum / qs.length) * 100;
-        const atRisk = qs.filter(q => (this.answers[q.id] || 0) > 0).length;
-        let level = 'ok';
-        if(pct >= 60) level = 'danger';
-        else if(pct >= 30) level = 'warn';
-        return { key, label: this.pillarLabels[key], pct, level, atRisk, total: qs.length };
-      });
-      const weakest = this.pillarResults.reduce((a,b) => b.pct > a.pct ? b : a, this.pillarResults[0]);
-      const topikLabel = this.topikLabels[this.profile.topik];
-      let message = this.pillarMessages[weakest.key];
-      if(topikLabel){
-        message += ` Ini sejajar dengan topik yang anda pilih tadi — ${topikLabel} — yang akan menjadi salah satu fokus utama sesi 18 Oktober nanti.`;
-      }
-      this.weakestPillar = {
-        key: weakest.key,
-        label: weakest.label,
-        level: weakest.level,
-        pct: weakest.pct,
-        atRisk: weakest.atRisk,
-        total: weakest.total,
-        consequence: this.pillarConsequences[weakest.key],
-        message,
-      };
+    finishQuiz(){
+      const results = this.pillarResults;
+      const weakest = results.reduce((a,b) => b.pct > a.pct ? b : a, results[0]);
+      this.weakestPillarKey = weakest.key;
       this.animateHeroNumber(Math.round(weakest.pct));
+      this.screen = 'result';
     },
 
     animateHeroNumber(target){
