@@ -157,11 +157,26 @@
   .pct.warn{color:#B87313;}
   .pct.danger{color:var(--red);}
 
-  .callout{
-    background:var(--navy);color:#fff;border-radius:16px;padding:20px;margin:22px 0;
+  .gap-hero{
+    border-radius:20px;padding:26px 22px;margin:20px 0 24px;color:#fff;
+    animation:heroPop .4s cubic-bezier(.2,.8,.3,1.2) both;
   }
-  .callout .tag{color:var(--amber);font-weight:800;font-size:12px;text-transform:uppercase;letter-spacing:.05em;margin-bottom:8px;display:block;}
-  .callout p{margin:0;font-size:15px;color:#EAF1FA;}
+  @keyframes heroPop{from{opacity:0;transform:scale(.96);}to{opacity:1;transform:scale(1);}}
+  .gap-hero.ok{background:linear-gradient(160deg,var(--green-dark),#0F5C45);}
+  .gap-hero.warn{background:linear-gradient(160deg,#B87313,#8A570D);}
+  .gap-hero.danger{background:linear-gradient(160deg,#C4453A,#8F2A22);}
+  .gap-hero-tag{
+    display:inline-block;font-size:12px;font-weight:800;letter-spacing:.05em;text-transform:uppercase;
+    background:rgba(255,255,255,.18);padding:5px 12px;border-radius:999px;margin-bottom:14px;
+  }
+  .gap-hero-number{
+    font-family:'Montserrat','Arial Black',sans-serif;font-weight:900;font-size:64px;line-height:1;
+    font-variant-numeric:tabular-nums;
+  }
+  .gap-hero-fraction{font-size:14px;font-weight:600;color:rgba(255,255,255,.85);margin-top:6px;}
+  .gap-hero-consequence{font-size:17px;font-weight:700;margin:16px 0 0;color:#fff;text-wrap:balance;}
+  .gap-hero-message{font-size:14.5px;margin:10px 0 0;color:rgba(255,255,255,.88);}
+  .pillar-breakdown-label{font-size:12px;font-weight:700;letter-spacing:.03em;text-transform:uppercase;color:var(--ink-soft);margin-bottom:12px;}
 
   .confirm-screen{align-items:center;text-align:center;justify-content:center;min-height:100vh;}
   .confirm-icon{font-size:52px;margin-bottom:18px;}
@@ -347,10 +362,18 @@
     <div class="screen">
       <div class="result-hero">
         <span class="hook-eyebrow" style="color:var(--green-dark);">Keputusan Anda</span>
-        <h2 class="headline">Ini gambaran jurang perlindungan anda, <span x-text="info.nama || 'sahabat'"></span></h2>
-        <p>Tiada jawapan yang "salah" — ini hanya untuk bantu kami dengar keperluan sebenar anda.</p>
+        <h2 class="headline"><span x-text="info.nama || 'Sahabat'"></span>, ini jurang perlindungan anda</h2>
       </div>
 
+      <div class="gap-hero" :class="weakestPillar.level">
+        <span class="gap-hero-tag" x-text="weakestPillar.label"></span>
+        <div class="gap-hero-number"><span x-text="heroDisplayPct"></span>%</div>
+        <div class="gap-hero-fraction" x-text="weakestPillar.atRisk + ' daripada ' + weakestPillar.total + ' soalan menunjukkan jurang di sini'"></div>
+        <p class="gap-hero-consequence" x-text="weakestPillar.consequence"></p>
+        <p class="gap-hero-message" x-text="weakestPillar.message"></p>
+      </div>
+
+      <div class="pillar-breakdown-label">Pecahan mengikut tonggak</div>
       <template x-for="p in pillarResults" :key="p.key">
         <div class="pillar-row">
           <div class="pillar-row-top">
@@ -363,13 +386,9 @@
         </div>
       </template>
 
-      <div class="callout">
-        <span class="tag">Jurang terbesar anda</span>
-        <p x-text="weakestPillar.message"></p>
-      </div>
-
-      <div class="nav-row" style="padding-top:0;">
-        <button class="btn btn-primary btn-block" @click="screen='confirm'" x-text="ctaLabel"></button>
+      <div class="nav-row" style="padding-top:8px;flex-direction:column;">
+        <button class="btn btn-primary btn-block" style="flex:0 0 auto;" @click="screen='confirm'" x-text="ctaLabel"></button>
+        <p style="color:var(--ink-soft);font-size:12px;text-align:center;margin-top:12px;">Percuma · Sarapan & makan tengah hari disediakan untuk sesi pagi</p>
       </div>
     </div>
   </template>
@@ -452,10 +471,20 @@ function quizApp(){
       financial: 'Kestabilan simpanan dan jaringan keselamatan keluarga anda di tanah air berkemungkinan belum mencukupi sekiranya berlaku musibah atau kehilangan pendapatan secara tiba-tiba.',
       rights: 'Anda mungkin belum pasti tentang hak kebajikan dan pampasan anda, atau rasa suara anda belum diambil kira dalam dasar sokongan pekerja rentas sempadan.',
     },
+    pillarConsequences: {
+      commute: 'Jika berlaku kecemasan di sempadan esok, anda mungkin keseorangan menguruskannya.',
+      financial: 'Jika pendapatan Singapura terhenti walau sebulan, keluarga anda di Malaysia turut terjejas.',
+      rights: 'Anda mungkin tidak tahu hak sebenar anda sehingga sudah terlambat untuk menuntutnya.',
+    },
     pillarLabels: {
       commute: 'Rutin & Kesejahteraan Perjalanan',
       financial: 'Kestabilan Simpanan & Keluarga',
       rights: 'Hak & Suara Pekerja Luar Negara',
+    },
+    pillarShortLabels: {
+      commute: 'perjalanan',
+      financial: 'kewangan keluarga',
+      rights: 'hak pekerja',
     },
     topikLabels: {
       rawatan_perubatan: 'kemudahan rawatan perubatan & klinik panel di Johor',
@@ -465,7 +494,8 @@ function quizApp(){
     },
 
     pillarResults: [],
-    weakestPillar: { key:'commute', message:'' },
+    weakestPillar: { key:'commute', label:'', message:'', consequence:'', atRisk:0, total:0, level:'ok' },
+    heroDisplayPct: 0,
 
     init(){
       const params = new URLSearchParams(window.location.search);
@@ -477,7 +507,12 @@ function quizApp(){
     get infoValid(){ return this.info.nama.trim().length > 0 && this.info.whatsapp.trim().length > 0 && this.info.kawasan.trim().length > 0; },
     get currentQuestion(){ return this.scoredQuestions[this.quizIndex]; },
     get currentProfileQ(){ return this.profileQuestions[this.profileIndex]; },
-    get ctaLabel(){ return this.profile.hadir === 'pagi' ? 'Daftar Sesi Pagi 18 Oktober 2026' : 'Hantar Ringkasan ke WhatsApp/Emel Saya'; },
+    get ctaLabel(){
+      const topic = this.pillarShortLabels[this.weakestPillar.key] || '';
+      return this.profile.hadir === 'pagi'
+        ? `Dapatkan Jawapan Tentang ${topic} — Daftar 18 Okt`
+        : `Hantar Ringkasan ${topic ? 'Tentang ' + topic + ' ' : ''}ke WhatsApp/E-mel Saya`;
+    },
 
     bridgeHtml(step, total){
       const pct = Math.min(100, Math.max(0, (step/total)*100));
@@ -658,10 +693,11 @@ function quizApp(){
         const qs = this.scoredQuestions.filter(q => q.pillar === key);
         const sum = qs.reduce((acc,q) => acc + (this.answers[q.id] || 0), 0);
         const pct = (sum / qs.length) * 100;
+        const atRisk = qs.filter(q => (this.answers[q.id] || 0) > 0).length;
         let level = 'ok';
         if(pct >= 60) level = 'danger';
         else if(pct >= 30) level = 'warn';
-        return { key, label: this.pillarLabels[key], pct, level };
+        return { key, label: this.pillarLabels[key], pct, level, atRisk, total: qs.length };
       });
       const weakest = this.pillarResults.reduce((a,b) => b.pct > a.pct ? b : a, this.pillarResults[0]);
       const topikLabel = this.topikLabels[this.profile.topik];
@@ -669,7 +705,29 @@ function quizApp(){
       if(topikLabel){
         message += ` Ini sejajar dengan topik yang anda pilih tadi — ${topikLabel} — yang akan menjadi salah satu fokus utama sesi 18 Oktober nanti.`;
       }
-      this.weakestPillar = { key: weakest.key, message };
+      this.weakestPillar = {
+        key: weakest.key,
+        label: weakest.label,
+        level: weakest.level,
+        pct: weakest.pct,
+        atRisk: weakest.atRisk,
+        total: weakest.total,
+        consequence: this.pillarConsequences[weakest.key],
+        message,
+      };
+      this.animateHeroNumber(Math.round(weakest.pct));
+    },
+
+    animateHeroNumber(target){
+      this.heroDisplayPct = 0;
+      const duration = 700;
+      const start = performance.now();
+      const step = (now) => {
+        const progress = Math.min(1, (now - start) / duration);
+        this.heroDisplayPct = Math.round(target * (1 - Math.pow(1 - progress, 3)));
+        if(progress < 1) requestAnimationFrame(step);
+      };
+      requestAnimationFrame(step);
     },
   };
 }
