@@ -376,6 +376,7 @@
       <h2 class="headline" x-text="profile.hadir === 'pagi' ? 'Pendaftaran anda diterima!' : 'Ringkasan sedang disediakan!'"></h2>
       <p x-show="profile.hadir === 'pagi'">Terima kasih, <span x-text="info.nama"></span>. Tempat anda untuk Sesi Pagi (9.00 pagi – 1.00 tengah hari) pada 18 Oktober 2026 di Johor telah direkodkan — kemasukan percuma, sarapan, makan tengah hari & cenderahati disediakan. Kami akan hubungi anda melalui WhatsApp untuk butiran lanjut.</p>
       <p x-show="profile.hadir !== 'pagi'">Terima kasih, <span x-text="info.nama"></span>. Ringkasan hasil kuiz dan maklumat skim akan dihantar ke WhatsApp/emel anda tidak lama lagi.</p>
+      <button class="btn btn-ghost" style="flex:0 0 auto;margin-top:24px;" @click="screen='result'">← Lihat semula keputusan saya</button>
       <p style="margin-top:20px;font-size:12px;color:#A6ADB4;">(Demo — tiada mesej sebenar dihantar)</p>
     </div>
   </template>
