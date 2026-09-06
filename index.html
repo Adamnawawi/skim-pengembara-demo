@@ -270,7 +270,12 @@
         <div class="field">
           <label>Nombor WhatsApp</label>
           <input type="tel" x-model="info.whatsapp" placeholder="01X-XXX XXXX">
-          <div class="field-hint">Untuk hantar ringkasan skor anda.</div>
+          <div class="field-hint">Untuk terima ringkasan skor.</div>
+        </div>
+        <div class="field">
+          <label>E-mel (pilihan)</label>
+          <input type="email" x-model="info.emel" placeholder="nama@emel.com">
+          <div class="field-hint">Jika anda pilih terima ringkasan melalui e-mel nanti.</div>
         </div>
         <div class="field">
           <label>Kawasan Tempat Tinggal di Johor</label>
@@ -392,7 +397,7 @@ function quizApp(){
     ref: null,
     utm_source: null,
 
-    info: { nama:'', whatsapp:'', kawasan:'' },
+    info: { nama:'', whatsapp:'', emel:'', kawasan:'' },
     quizIndex: 0,
     profileIndex: 0,
     answers: {},
@@ -407,12 +412,12 @@ function quizApp(){
     scoredQuestions: [
       { id:'c1', pillar:'commute', pillarLabel:'Rutin & Kesejahteraan Perjalanan', text:'Perjalanan Harian: Adakah anda mempunyai perancangan masa dan mod perjalanan yang selesa untuk berulang-alik merentas Tambak/Linkedua setiap minggu?' },
       { id:'c2', pillar:'commute', pillarLabel:'Rutin & Kesejahteraan Perjalanan', text:'Kecemasan Jalan Raya: Jika kenderaan atau pengangkutan anda terkandas di laluan sempadan, adakah anda mempunyai jaringan bantuan segera yang boleh dipercayai di Johor?' },
-      { id:'c3', pillar:'commute', pillarLabel:'Rutin & Kesejahteraan Perjalanan', text:'Rehat & Pemulihan: Jika anda memerlukan rehat perubatan di Malaysia (contoh: MC beberapa minggu), adakah pendapatan bulanan anda kekal tidak terjejas di Singapura?' },
-      { id:'f1', pillar:'financial', pillarLabel:'Kestabilan Simpanan & Keluarga di Tanah Air', text:'Penyambung Nafkah: Adakah hasil titik peluh anda di Singapura kini menjadi tunjang utama untuk perbelanjaan keluarga (anak, pasangan, atau ibu bapa) di Malaysia?' },
+      { id:'c3', pillar:'commute', pillarLabel:'Rutin & Kesejahteraan Perjalanan', text:'Rehat & Pemulihan: Jika anda memerlukan berehat (contoh: MC beberapa minggu), adakah pendapatan bulanan anda kekal tidak terjejas?' },
+      { id:'f1', pillar:'financial', pillarLabel:'Kestabilan Simpanan & Keluarga di Tanah Air', text:'Penyambung Nafkah: Adakah hasil titik peluh anda di Singapura kini menjadi tunjang utama untuk perbelanjaan keluarga (anak, pasangan, atau ibu bapa)?' },
       { id:'f2', pillar:'financial', pillarLabel:'Kestabilan Simpanan & Keluarga di Tanah Air', text:'Jaringan Keselamatan Malaysia: Selain simpanan bank biasa, adakah anda mempunyai sebarang tabung atau dana kebajikan rasmi di Malaysia yang bertindak sebagai "payung kecemasan"?' },
-      { id:'f3', pillar:'financial', pillarLabel:'Kestabilan Simpanan & Keluarga di Tanah Air', text:'Kesinambungan Sara Hidup: Sekiranya berlaku musibah atau kecederaan di luar jangka, adakah anda mempunyai jaringan sokongan rasmi di tanah air yang mampu menyediakan rawatan pemulihan fizikal berterusan serta bantuan sara hidup berkala untuk keluarga anda?' },
-      { id:'r1', pillar:'rights', pillarLabel:'Hak & Suara Pekerja Luar Negara', text:'Pampasan Adil: Adakah anda tahu hak kebajikan dan pampasan yang sepatutnya anda terima sekiranya berlaku sebarang kesulitan semasa waktu bertugas?' },
-      { id:'r2', pillar:'rights', pillarLabel:'Hak & Suara Pekerja Luar Negara', text:'Kemudahan di Tanah Air: Adakah anda berminat jika Malaysia menyediakan pusat sokongan atau rawatan khas yang mudah diakses untuk pekerja rentas sempadan di Johor?' },
+      { id:'f3', pillar:'financial', pillarLabel:'Kestabilan Simpanan & Keluarga di Tanah Air', text:'Kesinambungan Sara Hidup: Sekiranya berlaku musibah atau kecederaan di luar jangka, adakah anda mempunyai jaringan sokongan yang mampu menyediakan rawatan pemulihan fizikal berterusan serta bantuan sara hidup berkala untuk keluarga anda?' },
+      { id:'r1', pillar:'rights', pillarLabel:'Hak & Suara Pekerja Luar Negara', text:'Pampasan Adil: Adakah anda tahu hak kebajikan dan pampasan yang sepatutnya anda terima sekiranya berlaku sebarang kesulitan semasa bertugas?' },
+      { id:'r2', pillar:'rights', pillarLabel:'Hak & Suara Pekerja Luar Negara', text:'Kemudahan: Adakah anda berminat jika Malaysia menyediakan pusat sokongan atau rawatan khas yang mudah diakses untuk pekerja rentas sempadan?' },
       { id:'r3', pillar:'rights', pillarLabel:'Hak & Suara Pekerja Luar Negara', text:'Masa Depan Sektor: Adakah anda bersetuju bahawa pekerja Malaysia di Singapura wajar mempunyai skim kebajikan rasmi bertaraf antarabangsa yang diiktiraf kerajaan?' },
       { id:'r4', pillar:'rights', pillarLabel:'Hak & Suara Pekerja Luar Negara', text:'Peluang Bersuara: Adakah anda ingin pandangan dan pengalaman sebenar anda diambil kira dalam penggubalan dasar bantuan untuk pekerja seperti anda?' },
     ],
