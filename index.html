@@ -121,7 +121,15 @@
     display:inline-block;font-size:11px;font-weight:700;letter-spacing:.03em;text-transform:uppercase;
     color:var(--green-dark);background:#E7F5EF;padding:5px 10px;border-radius:999px;margin-bottom:14px;
   }
+  .question-subtitle{font-size:13px;font-weight:800;letter-spacing:.03em;text-transform:uppercase;color:var(--green-dark);margin-bottom:8px;}
   .question-text{font-size:21px;font-weight:800;font-family:'Montserrat','Noto Sans SC','Noto Sans Tamil',sans-serif;color:var(--navy);margin-bottom:22px;}
+
+  /* ---------- INTRO SCREEN ---------- */
+  .intro-block{margin-bottom:22px;}
+  .intro-block h3{font-size:13px;font-weight:800;letter-spacing:.04em;text-transform:uppercase;color:var(--green-dark);margin-bottom:8px;}
+  .intro-block p{font-size:14.5px;color:var(--ink);margin:0;}
+  .intro-block.disclaimer h3{color:var(--ink-soft);}
+  .intro-block.disclaimer p{color:var(--ink-soft);font-size:13px;}
 
   .option-btn{
     display:flex;align-items:center;justify-content:space-between;width:100%;text-align:left;
@@ -278,8 +286,27 @@
         </svg>
       </div>
       <div class="hook-footer">
-        <button class="btn btn-primary btn-block" @click="screen='info'" x-text="T.hook.cta"></button>
+        <button class="btn btn-primary btn-block" @click="screen='intro'" x-text="T.hook.cta"></button>
         <p style="color:#9FB3C8;font-size:12px;text-align:center;margin-top:12px;" x-text="T.hook.caption"></p>
+      </div>
+    </div>
+  </template>
+
+  <!-- ================= INTRO / OBJECTIVE & DISCLAIMER ================= -->
+  <template x-if="screen === 'intro'">
+    <div class="screen">
+      <h2 style="font-size:22px;margin-bottom:20px;" x-text="T.intro.heading"></h2>
+      <div class="intro-block">
+        <h3 x-text="T.intro.objectiveLabel"></h3>
+        <p x-text="T.intro.objectiveText"></p>
+      </div>
+      <div class="intro-block disclaimer">
+        <h3 x-text="T.intro.disclaimerLabel"></h3>
+        <p x-text="T.intro.disclaimerText"></p>
+      </div>
+      <div class="nav-row">
+        <button class="btn btn-ghost" @click="screen='hook'" x-text="T.backBtn"></button>
+        <button class="btn btn-primary btn-block" @click="screen='info'" x-text="T.intro.continueBtn"></button>
       </div>
     </div>
   </template>
@@ -329,6 +356,7 @@
       <div class="q-block" :class="{'q-fade': transitioning}">
         <div class="q-scene" :class="'q-scene-' + currentQuestion.pillar" x-html="pillarSceneHtml(currentQuestion.pillar)"></div>
         <span class="pillar-tag" x-text="currentQuestion.pillarLabel"></span>
+        <div class="question-subtitle" x-text="currentQuestion.subtitle"></div>
         <div class="question-text" x-text="currentQuestion.text"></div>
         <div>
           <template x-for="opt in T.scoreOptions" :key="opt.value">
@@ -411,7 +439,11 @@
       <h2 class="headline" x-text="profile.hadir === 'pagi' ? T.confirm.headingPagi : T.confirm.headingJauh"></h2>
       <p x-show="profile.hadir === 'pagi'" x-text="fmt(T.confirm.bodyPagi, {nama: info.nama})"></p>
       <p x-show="profile.hadir !== 'pagi'" x-text="fmt(T.confirm.bodyJauh, {nama: info.nama})"></p>
-      <button class="btn btn-ghost" style="flex:0 0 auto;margin-top:24px;" @click="screen='result'" x-text="T.confirm.backLink"></button>
+      <p style="margin-top:16px;font-weight:700;color:var(--navy);" x-text="T.confirm.thanks"></p>
+      <div style="display:flex;gap:10px;margin-top:24px;">
+        <button class="btn btn-ghost" style="flex:0 0 auto;" @click="screen='result'" x-text="T.confirm.backLink"></button>
+        <button class="btn btn-ghost" style="flex:0 0 auto;" @click="resetQuiz()" x-text="T.confirm.restartBtn"></button>
+      </div>
       <p style="margin-top:20px;font-size:12px;color:#A6ADB4;" x-text="T.confirm.demoNote"></p>
     </div>
   </template>
@@ -433,6 +465,14 @@ const translations = {
       sub: 'Setiap hari anda menyeberangi tambak untuk mencari rezeki. PERKESO nak tahu — di mana jurang perlindungan keselamatan/kesihatan anda & bagaimana kami boleh bantu?',
       cta: 'Mula Kuiz 2 Minit',
       caption: 'Sesi Libat Urus PERKESO Johor · 18 Oktober 2026',
+    },
+    intro: {
+      heading: 'Sebelum Kita Mula',
+      objectiveLabel: 'Objektif Kajian',
+      objectiveText: 'Kajian ringkas ini bertujuan memahami jurang perlindungan sebenar yang dihadapi oleh pekerja Malaysia yang bekerja di Singapura, untuk membantu PERKESO Johor merangka sokongan yang lebih tepat pada Sesi Libat Urus 18 Oktober 2026.',
+      disclaimerLabel: 'Penafian',
+      disclaimerText: 'Penyertaan adalah sukarela. Jawapan anda digunakan semata-mata untuk tujuan kajian ini dan pendaftaran sesi / penghantaran ringkasan — tiada tujuan pemasaran lain. Tiada maklumat sensitif seperti nombor IC atau butiran kewangan dikumpul.',
+      continueBtn: 'Faham, Teruskan',
     },
     info: {
       heading: 'Sikit je maklumat asas anda',
@@ -462,16 +502,16 @@ const translations = {
       { label:'Tidak', value:1 },
     ],
     questions: {
-      c1: 'Perjalanan Harian: Adakah anda mempunyai perancangan masa dan mod perjalanan yang selesa untuk berulang-alik merentas Tambak/Linkedua setiap minggu?',
-      c2: 'Kecemasan Jalan Raya: Jika kenderaan atau pengangkutan anda terkandas di laluan sempadan, adakah anda mempunyai jaringan bantuan segera yang boleh dipercayai di Johor?',
-      c3: 'Rehat & Pemulihan: Jika anda memerlukan cuti sakit / cuti bagi menjalani rawatan perubatan (contoh: MC beberapa minggu), adakah pendapatan bulanan anda kekal tidak terjejas?',
-      f1: 'Penyambung Nafkah: Adakah hasil titik peluh anda di Singapura kini menjadi tunjang utama untuk perbelanjaan keluarga (anak, pasangan, atau ibu bapa)?',
-      f2: 'Jaringan Keselamatan Malaysia: Selain simpanan bank biasa, adakah anda mempunyai sebarang tabung atau dana kebajikan rasmi di Malaysia yang bertindak sebagai "payung kecemasan"?',
-      f3: 'Kesinambungan Sara Hidup: Sekiranya berlaku musibah atau kecederaan di luar jangka, adakah anda mempunyai jaringan sokongan yang mampu menyediakan rawatan pemulihan fizikal berterusan serta bantuan sara hidup berkala untuk keluarga anda?',
-      r1: 'Pampasan Adil: Adakah anda tahu hak kebajikan dan pampasan yang sepatutnya anda terima sekiranya berlaku sebarang kesulitan semasa bertugas?',
-      r2: 'Kemudahan: Adakah anda berminat jika Malaysia menyediakan pusat sokongan atau rawatan khas yang mudah diakses untuk pekerja rentas sempadan?',
-      r3: 'Masa Depan Sektor: Adakah anda bersetuju bahawa pekerja Malaysia di Singapura wajar mempunyai skim kebajikan rasmi bertaraf antarabangsa yang diiktiraf kerajaan?',
-      r4: 'Peluang Bersuara: Adakah anda ingin pandangan dan pengalaman sebenar anda diambil kira dalam penggubalan dasar bantuan untuk pekerja seperti anda?',
+      c1: { subtitle:'Perjalanan Harian', text:'Adakah perjalanan mingguan anda merentas Tambak/Linkedua selesa dan boleh diuruskan dengan baik?' },
+      c2: { subtitle:'Kecemasan Jalan Raya', text:'Jika kenderaan atau pengangkutan anda terkandas di laluan sempadan, adakah anda mempunyai jaringan bantuan segera yang boleh dipercayai di Johor?' },
+      c3: { subtitle:'Rehat & Pemulihan', text:'Jika anda memerlukan cuti sakit atau cuti bagi menjalani rawatan perubatan (contoh: MC beberapa minggu), adakah pendapatan bulanan anda akan terjejas?' },
+      f1: { subtitle:'Penyambung Nafkah', text:'Adakah hasil titik peluh anda di Singapura kini menjadi tunjang utama untuk perbelanjaan keluarga (anak, pasangan, atau ibu bapa)?' },
+      f2: { subtitle:'Jaringan Keselamatan Malaysia', text:'Selain simpanan bank biasa, adakah anda mempunyai sebarang tabung atau dana kebajikan rasmi di Malaysia yang bertindak sebagai "payung kecemasan"?' },
+      f3: { subtitle:'Kesinambungan Sara Hidup', text:'Sekiranya berlaku musibah atau kecederaan di luar jangka, adakah anda mempunyai jaringan sokongan yang mampu menyediakan rawatan pemulihan fizikal berterusan serta bantuan sara hidup berkala untuk keluarga anda?' },
+      r1: { subtitle:'Pampasan Adil', text:'Adakah anda tahu hak kebajikan dan pampasan yang sepatutnya anda terima sekiranya berlaku sebarang kesulitan semasa bertugas?' },
+      r2: { subtitle:'Kemudahan', text:'Adakah anda berminat jika Malaysia menyediakan pusat sokongan atau rawatan khas yang mudah diakses untuk pekerja rentas sempadan?' },
+      r3: { subtitle:'Masa Depan Sektor', text:'Adakah anda bersetuju bahawa pekerja Malaysia di Singapura wajar mempunyai skim kebajikan rasmi bertaraf antarabangsa yang diiktiraf kerajaan?' },
+      r4: { subtitle:'Peluang Bersuara', text:'Adakah anda ingin pandangan dan pengalaman sebenar anda diambil kira dalam penggubalan dasar bantuan untuk pekerja seperti anda?' },
     },
     profileQuestions: {
       tempoh: { text:'Berapa lama anda telah bekerja di Singapura?', options:{
@@ -528,6 +568,8 @@ const translations = {
       bodyPagi: 'Terima kasih, {nama}. Tempat anda untuk Sesi Pagi (9.00 pagi – 1.00 tengah hari) pada 18 Oktober 2026 di Johor telah direkodkan — kemasukan percuma, sarapan, makan tengah hari & cenderahati disediakan. Kami akan hubungi anda melalui WhatsApp untuk butiran lanjut.',
       bodyJauh: 'Terima kasih, {nama}. Ringkasan hasil kuiz dan maklumat skim akan dihantar ke WhatsApp/emel anda tidak lama lagi.',
       backLink: '← Lihat semula keputusan saya',
+      thanks: 'Terima kasih kerana sudi meluangkan masa untuk menjawab tinjauan ini!',
+      restartBtn: 'Isi Semula',
       demoNote: '(Demo — tiada mesej sebenar dihantar)',
     },
     bridge: { johor:'Johor', singapura:'Singapura', step:'Langkah {step} / {total}' },
@@ -544,6 +586,14 @@ const translations = {
       sub: 'Every day you cross the Causeway to earn a living. PERKESO wants to know — where are the gaps in your safety and health protection, and how can we help?',
       cta: 'Start the 2-Minute Quiz',
       caption: 'PERKESO Johor Engagement Session · 18 October 2026',
+    },
+    intro: {
+      heading: 'Before We Begin',
+      objectiveLabel: 'Survey Objective',
+      objectiveText: 'This short survey aims to understand the real protection gaps faced by Malaysians working in Singapore, to help PERKESO Johor design better support at the 18 October 2026 Engagement Session.',
+      disclaimerLabel: 'Disclaimer',
+      disclaimerText: "Participation is voluntary. Your answers are used only for this survey and for session registration / sending your summary — no other marketing purpose. No sensitive information such as IC number or financial details is collected.",
+      continueBtn: 'I Understand, Continue',
     },
     info: {
       heading: 'Just a few basic details',
@@ -573,16 +623,16 @@ const translations = {
       { label:'No', value:1 },
     ],
     questions: {
-      c1: 'Daily Commute: Do you have a comfortable time plan and mode of travel for your weekly back-and-forth across the Causeway/Second Link?',
-      c2: 'Roadside Emergency: If your vehicle or transport breaks down on the border route, do you have a reliable emergency support network in Johor?',
-      c3: "Rest & Recovery: If you need sick leave or leave for medical treatment (e.g. a few weeks' MC), does your monthly income stay unaffected?",
-      f1: "Sole Breadwinner: Is the money you earn in Singapore now the main support for your family's expenses (children, spouse, or parents)?",
-      f2: 'Malaysia Safety Net: Besides regular bank savings, do you have any official welfare fund in Malaysia that acts as an "emergency umbrella"?',
-      f3: 'Continuity of Livelihood: If an unexpected accident or injury occurs, do you have a support network that can provide ongoing physical rehabilitation and regular living support for your family?',
-      r1: "Fair Compensation: Do you know the welfare rights and compensation you're entitled to if something goes wrong while on duty?",
-      r2: 'Facilities: Would you be interested if Malaysia provided an easily accessible support or treatment centre for cross-border workers?',
-      r3: 'Future of the Sector: Do you agree that Malaysian workers in Singapore deserve an official, internationally-recognised welfare scheme backed by the government?',
-      r4: 'A Chance to Be Heard: Do you want your real views and experiences taken into account when shaping support policies for workers like you?',
+      c1: { subtitle:'Daily Commute', text:'Is your weekly commute across the Causeway/Second Link comfortable and well-manageable?' },
+      c2: { subtitle:'Roadside Emergency', text:'If your vehicle or transport breaks down on the border route, do you have a reliable emergency support network in Johor?' },
+      c3: { subtitle:'Rest & Recovery', text:"If you need sick leave or leave for medical treatment (e.g. a few weeks' MC), will your monthly income be affected?" },
+      f1: { subtitle:'Sole Breadwinner', text:"Is the money you earn in Singapore now the main support for your family's expenses (children, spouse, or parents)?" },
+      f2: { subtitle:'Malaysia Safety Net', text:'Besides regular bank savings, do you have any official welfare fund in Malaysia that acts as an "emergency umbrella"?' },
+      f3: { subtitle:'Continuity of Livelihood', text:'If an unexpected accident or injury occurs, do you have a support network that can provide ongoing physical rehabilitation and regular living support for your family?' },
+      r1: { subtitle:'Fair Compensation', text:"Do you know the welfare rights and compensation you're entitled to if something goes wrong while on duty?" },
+      r2: { subtitle:'Facilities', text:'Would you be interested if Malaysia provided an easily accessible support or treatment centre for cross-border workers?' },
+      r3: { subtitle:'Future of the Sector', text:'Do you agree that Malaysian workers in Singapore deserve an official, internationally-recognised welfare scheme backed by the government?' },
+      r4: { subtitle:'A Chance to Be Heard', text:'Do you want your real views and experiences taken into account when shaping support policies for workers like you?' },
     },
     profileQuestions: {
       tempoh: { text:'How long have you been working in Singapore?', options:{
@@ -639,6 +689,8 @@ const translations = {
       bodyPagi: "Thank you, {nama}. Your spot for the Morning Session (9:00am – 1:00pm) on 18 October 2026 in Johor has been recorded — free entry, breakfast, lunch & souvenir provided. We'll contact you via WhatsApp with further details.",
       bodyJauh: 'Thank you, {nama}. Your quiz summary and scheme information will be sent to your WhatsApp/email shortly.',
       backLink: '← View my result again',
+      thanks: 'Thank you for taking the time to complete this survey!',
+      restartBtn: 'Start Over',
       demoNote: '(Demo — no real message is sent)',
     },
     bridge: { johor:'Johor', singapura:'Singapore', step:'Step {step} / {total}' },
@@ -655,6 +707,14 @@ const translations = {
       sub: '您每天跨越长堤讨生活。PERKESO 想知道——您在安全与健康保障方面还有哪些缺口，我们可以如何协助？',
       cta: '开始 2 分钟测验',
       caption: 'PERKESO 柔佛互动交流会 · 2026年10月18日',
+    },
+    intro: {
+      heading: '开始之前',
+      objectiveLabel: '调查目的',
+      objectiveText: '这项简短调查旨在了解在新加坡工作的马来西亚人所面对的真实保障缺口，以协助PERKESO柔佛在2026年10月18日的互动交流会上，规划更贴切的支援措施。',
+      disclaimerLabel: '免责声明',
+      disclaimerText: '参与纯属自愿。您的回答仅用于本次调查及交流会登记／摘要发送用途——绝不用于其他推广用途。本调查不会收集身份证号码或财务详情等敏感资料。',
+      continueBtn: '明白，继续',
     },
     info: {
       heading: '只需填写基本资料',
@@ -684,16 +744,16 @@ const translations = {
       { label:'否', value:1 },
     ],
     questions: {
-      c1: '每日通勤：您是否已为每周往返长堤/第二通道安排好舒适的时间与交通方式？',
-      c2: '路上突发状况：若您的交通工具在边境路段抛锚，您在柔佛是否有可靠的紧急支援网络？',
-      c3: '休养与恢复：若您需要病假或接受医疗的假期（例如数周MC），您的月收入是否仍不受影响？',
-      f1: '家庭经济支柱：您在新加坡辛苦赚取的收入，目前是否是家人（子女、配偶或父母）生活开销的主要来源？',
-      f2: '马来西亚安全网：除了一般银行储蓄，您是否在马来西亚拥有任何可作为「应急保护伞」的官方福利基金？',
-      f3: '持续生计保障：若不幸发生意外或受伤，您是否有正式的支援网络，能持续提供身体复健治疗及定期生活援助给您的家人？',
-      r1: '公平赔偿：若在值勤期间发生任何意外，您是否了解自己应得的福利权益与赔偿？',
-      r2: '配套设施：若马来西亚为跨境工作者提供便利可及的支援或医疗中心，您是否感兴趣？',
-      r3: '行业未来：您是否认同，在新加坡工作的马来西亚员工应享有获政府认可、达国际水平的正式福利计划？',
-      r4: '发声机会：您是否希望自己真实的想法与经历，能被纳入为您这样的工作者制定援助政策的考量？',
+      c1: { subtitle:'每日通勤', text:'您每周往返长堤/第二通道的通勤是否顺畅、容易安排？' },
+      c2: { subtitle:'路上突发状况', text:'若您的交通工具在边境路段抛锚，您在柔佛是否有可靠的紧急支援网络？' },
+      c3: { subtitle:'休养与恢复', text:'若您需要病假或接受医疗的假期（例如数周MC），您的月收入是否会受影响？' },
+      f1: { subtitle:'家庭经济支柱', text:'您在新加坡辛苦赚取的收入，目前是否是家人（子女、配偶或父母）生活开销的主要来源？' },
+      f2: { subtitle:'马来西亚安全网', text:'除了一般银行储蓄，您是否在马来西亚拥有任何可作为「应急保护伞」的官方福利基金？' },
+      f3: { subtitle:'持续生计保障', text:'若不幸发生意外或受伤，您是否有正式的支援网络，能持续提供身体复健治疗及定期生活援助给您的家人？' },
+      r1: { subtitle:'公平赔偿', text:'若在值勤期间发生任何意外，您是否了解自己应得的福利权益与赔偿？' },
+      r2: { subtitle:'配套设施', text:'若马来西亚为跨境工作者提供便利可及的支援或医疗中心，您是否感兴趣？' },
+      r3: { subtitle:'行业未来', text:'您是否认同，在新加坡工作的马来西亚员工应享有获政府认可、达国际水平的正式福利计划？' },
+      r4: { subtitle:'发声机会', text:'您是否希望自己真实的想法与经历，能被纳入为您这样的工作者制定援助政策的考量？' },
     },
     profileQuestions: {
       tempoh: { text:'您在新加坡工作多久了？', options:{
@@ -750,6 +810,8 @@ const translations = {
       bodyPagi: '谢谢您，{nama}。您在2026年10月18日柔佛早场（上午9时至下午1时）的名额已记录——免费入场，提供早餐、午餐与纪念品。我们将透过WhatsApp联系您以告知详情。',
       bodyJauh: '谢谢您，{nama}。测验摘要与计划资讯将很快发送至您的WhatsApp/电邮。',
       backLink: '← 重新查看我的结果',
+      thanks: '谢谢您抽空完成这份调查！',
+      restartBtn: '重新填写',
       demoNote: '（示范版本 — 不会发送真实讯息）',
     },
     bridge: { johor:'柔佛', singapura:'新加坡', step:'步骤 {step} / {total}' },
@@ -766,6 +828,14 @@ const translations = {
       sub: 'ஒவ்வொரு நாளும் நீங்கள் வாழ்வாதாரத்திற்காக காஸ்வேயை கடக்கிறீர்கள். உங்கள் பாதுகாப்பு/சுகாதார பாதுகாப்பில் உள்ள இடைவெளி எங்கே, நாங்கள் எப்படி உதவ முடியும் என்பதை PERKESO அறிய விரும்புகிறது.',
       cta: '2 நிமிட வினாடி வினாவைத் தொடங்கு',
       caption: 'PERKESO ஜொகூர் ஈடுபாட்டு அமர்வு · 18 அக்டோபர் 2026',
+    },
+    intro: {
+      heading: 'நாம் தொடங்குவதற்கு முன்',
+      objectiveLabel: 'கணக்கெடுப்பின் நோக்கம்',
+      objectiveText: 'சிங்கப்பூரில் பணிபுரியும் மலேசியர்கள் எதிர்கொள்ளும் உண்மையான பாதுகாப்பு இடைவெளிகளைப் புரிந்துகொள்வதே இந்தச் சிறு கணக்கெடுப்பின் நோக்கமாகும் — இது 18 அக்டோபர் 2026 ஈடுபாட்டு அமர்விற்கு மேலும் துல்லியமான ஆதரவை வடிவமைக்க PERKESO ஜொகூருக்கு உதவும்.',
+      disclaimerLabel: 'பொறுப்புத் துறப்பு',
+      disclaimerText: 'பங்கேற்பு தன்னார்வமானது. உங்கள் பதில்கள் இந்தக் கணக்கெடுப்பு மற்றும் அமர்வு பதிவு / சுருக்கம் அனுப்புதல் ஆகியவற்றுக்கு மட்டுமே பயன்படுத்தப்படும் — வேறு எந்த சந்தைப்படுத்தல் நோக்கமும் இல்லை. அடையாள அட்டை எண் அல்லது நிதி விவரங்கள் போன்ற முக்கியமான தகவல்கள் எதுவும் சேகரிக்கப்படாது.',
+      continueBtn: 'புரிந்தது, தொடரவும்',
     },
     info: {
       heading: 'உங்கள் அடிப்படை விவரங்கள் சிலவற்றை மட்டும்',
@@ -795,16 +865,16 @@ const translations = {
       { label:'இல்லை', value:1 },
     ],
     questions: {
-      c1: 'தினசரி பயணம்: காஸ்வே/இரண்டாம் இணைப்பை வாரந்தோறும் கடப்பதற்கு வசதியான நேர திட்டமும் பயண முறையும் உங்களிடம் உள்ளதா?',
-      c2: 'சாலை அவசரநிலை: எல்லைப் பாதையில் உங்கள் வாகனம் அல்லது போக்குவரத்து பழுதடைந்தால், ஜொகூரில் நம்பகமான உடனடி உதவி வலையமைப்பு உங்களிடம் உள்ளதா?',
-      c3: 'ஓய்வும் மீட்சியும்: நீங்கள் மருத்துவ விடுப்பு எடுக்க வேண்டியிருந்தால் (எ.கா. சில வாரங்கள் MC), உங்கள் மாத வருமானம் பாதிக்கப்படாமல் இருக்குமா?',
-      f1: 'முதன்மை உழைப்பாளி: சிங்கப்பூரில் நீங்கள் சம்பாதிக்கும் வருமானம் இப்போது உங்கள் குடும்பச் செலவுகளுக்கு (பிள்ளைகள், துணைவர், பெற்றோர்) முதன்மை ஆதாரமாக உள்ளதா?',
-      f2: 'மலேசிய பாதுகாப்பு வலையமைப்பு: வழக்கமான வங்கி சேமிப்புக்கு கூடுதலாக, "அவசரகால குடை" போல செயல்படும் அதிகாரப்பூர்வ நல நிதி மலேசியாவில் உங்களிடம் உள்ளதா?',
-      f3: 'வாழ்வாதார தொடர்ச்சி: எதிர்பாராத விபத்து அல்லது காயம் ஏற்பட்டால், தொடர்ச்சியான உடல் மீட்சி சிகிச்சையையும் உங்கள் குடும்பத்திற்கு அவ்வப்போது வாழ்வாதார உதவியையும் வழங்கக்கூடிய அதிகாரப்பூர்வ ஆதரவு வலையமைப்பு உங்களிடம் உள்ளதா?',
-      r1: 'நியாயமான இழப்பீடு: பணியின் போது ஏதேனும் சிக்கல் ஏற்பட்டால், நீங்கள் பெற வேண்டிய நல உரிமைகள் மற்றும் இழப்பீடு பற்றி உங்களுக்குத் தெரியுமா?',
-      r2: 'வசதிகள்: எல்லை கடந்து பணிபுரியும் தொழிலாளர்களுக்கு எளிதில் அணுகக்கூடிய ஆதரவு அல்லது சிகிச்சை மையத்தை மலேசியா வழங்கினால், நீங்கள் ஆர்வமாக இருப்பீர்களா?',
-      r3: 'துறையின் எதிர்காலம்: சிங்கப்பூரில் பணிபுரியும் மலேசிய தொழிலாளர்களுக்கு அரசு அங்கீகரித்த, சர்வதேச தரத்திலான அதிகாரப்பூர்வ நல திட்டம் இருக்க வேண்டும் என்று நீங்கள் ஒப்புக்கொள்கிறீர்களா?',
-      r4: 'குரல் கொடுக்கும் வாய்ப்பு: உங்களைப் போன்ற தொழிலாளர்களுக்கான உதவிக் கொள்கைகளை வடிவமைக்கும்போது, உங்கள் உண்மையான கருத்துகளும் அனுபவங்களும் கருத்தில் கொள்ளப்பட வேண்டும் என்று விரும்புகிறீர்களா?',
+      c1: { subtitle:'தினசரி பயணம்', text:'காஸ்வே/இரண்டாம் இணைப்பை வாரந்தோறும் கடப்பது உங்களுக்கு வசதியாகவும் நன்கு நிர்வகிக்கக்கூடியதாகவும் உள்ளதா?' },
+      c2: { subtitle:'சாலை அவசரநிலை', text:'எல்லைப் பாதையில் உங்கள் வாகனம் அல்லது போக்குவரத்து பழுதடைந்தால், ஜொகூரில் நம்பகமான உடனடி உதவி வலையமைப்பு உங்களிடம் உள்ளதா?' },
+      c3: { subtitle:'ஓய்வும் மீட்சியும்', text:'நீங்கள் மருத்துவ விடுப்பு எடுக்க வேண்டியிருந்தால் (எ.கா. சில வாரங்கள் MC), உங்கள் மாத வருமானம் பாதிக்கப்படுமா?' },
+      f1: { subtitle:'முதன்மை உழைப்பாளி', text:'சிங்கப்பூரில் நீங்கள் சம்பாதிக்கும் வருமானம் இப்போது உங்கள் குடும்பச் செலவுகளுக்கு (பிள்ளைகள், துணைவர், பெற்றோர்) முதன்மை ஆதாரமாக உள்ளதா?' },
+      f2: { subtitle:'மலேசிய பாதுகாப்பு வலையமைப்பு', text:'வழக்கமான வங்கி சேமிப்புக்கு கூடுதலாக, "அவசரகால குடை" போல செயல்படும் அதிகாரப்பூர்வ நல நிதி மலேசியாவில் உங்களிடம் உள்ளதா?' },
+      f3: { subtitle:'வாழ்வாதார தொடர்ச்சி', text:'எதிர்பாராத விபத்து அல்லது காயம் ஏற்பட்டால், தொடர்ச்சியான உடல் மீட்சி சிகிச்சையையும் உங்கள் குடும்பத்திற்கு அவ்வப்போது வாழ்வாதார உதவியையும் வழங்கக்கூடிய அதிகாரப்பூர்வ ஆதரவு வலையமைப்பு உங்களிடம் உள்ளதா?' },
+      r1: { subtitle:'நியாயமான இழப்பீடு', text:'பணியின் போது ஏதேனும் சிக்கல் ஏற்பட்டால், நீங்கள் பெற வேண்டிய நல உரிமைகள் மற்றும் இழப்பீடு பற்றி உங்களுக்குத் தெரியுமா?' },
+      r2: { subtitle:'வசதிகள்', text:'எல்லை கடந்து பணிபுரியும் தொழிலாளர்களுக்கு எளிதில் அணுகக்கூடிய ஆதரவு அல்லது சிகிச்சை மையத்தை மலேசியா வழங்கினால், நீங்கள் ஆர்வமாக இருப்பீர்களா?' },
+      r3: { subtitle:'துறையின் எதிர்காலம்', text:'சிங்கப்பூரில் பணிபுரியும் மலேசிய தொழிலாளர்களுக்கு அரசு அங்கீகரித்த, சர்வதேச தரத்திலான அதிகாரப்பூர்வ நல திட்டம் இருக்க வேண்டும் என்று நீங்கள் ஒப்புக்கொள்கிறீர்களா?' },
+      r4: { subtitle:'குரல் கொடுக்கும் வாய்ப்பு', text:'உங்களைப் போன்ற தொழிலாளர்களுக்கான உதவிக் கொள்கைகளை வடிவமைக்கும்போது, உங்கள் உண்மையான கருத்துகளும் அனுபவங்களும் கருத்தில் கொள்ளப்பட வேண்டும் என்று விரும்புகிறீர்களா?' },
     },
     profileQuestions: {
       tempoh: { text:'நீங்கள் சிங்கப்பூரில் எவ்வளவு காலமாக பணிபுரிகிறீர்கள்?', options:{
@@ -861,6 +931,8 @@ const translations = {
       bodyPagi: 'நன்றி, {nama}. 18 அக்டோபர் 2026 ஜொகூரில் நடைபெறும் காலை அமர்விற்கான (காலை 9.00 – மதியம் 1.00) உங்கள் இடம் பதிவு செய்யப்பட்டுள்ளது — இலவச நுழைவு, காலை உணவு, மதிய உணவு & நினைவுப் பரிசு வழங்கப்படும். மேலும் விவரங்களுக்கு நாங்கள் WhatsApp மூலம் உங்களைத் தொடர்பு கொள்வோம்.',
       bodyJauh: 'நன்றி, {nama}. வினாடி வினா சுருக்கமும் திட்ட தகவலும் விரைவில் உங்கள் WhatsApp/மின்னஞ்சலுக்கு அனுப்பப்படும்.',
       backLink: '← எனது முடிவை மீண்டும் பார்க்கவும்',
+      thanks: 'இந்த கணக்கெடுப்பை நிறைவு செய்ய நேரம் ஒதுக்கியதற்கு நன்றி!',
+      restartBtn: 'மீண்டும் நிரப்பவும்',
       demoNote: '(டெமோ — உண்மையான செய்தி எதுவும் அனுப்பப்படவில்லை)',
     },
     bridge: { johor:'ஜொகூர்', singapura:'சிங்கப்பூர்', step:'படி {step} / {total}' },
@@ -888,7 +960,7 @@ function quizApp(){
     profile: {},
 
     questionMeta: [
-      { id:'c1', pillar:'commute' }, { id:'c2', pillar:'commute' }, { id:'c3', pillar:'commute' },
+      { id:'c1', pillar:'commute' }, { id:'c2', pillar:'commute' }, { id:'c3', pillar:'commute', invert:true },
       { id:'f1', pillar:'financial' }, { id:'f2', pillar:'financial' }, { id:'f3', pillar:'financial' },
       { id:'r1', pillar:'rights' }, { id:'r2', pillar:'rights' }, { id:'r3', pillar:'rights' }, { id:'r4', pillar:'rights' },
     ],
@@ -921,7 +993,8 @@ function quizApp(){
 
     get currentQuestion(){
       const meta = this.questionMeta[this.quizIndex];
-      return { id: meta.id, pillar: meta.pillar, pillarLabel: this.T.pillarLabels[meta.pillar], text: this.T.questions[meta.id] };
+      const q = this.T.questions[meta.id];
+      return { id: meta.id, pillar: meta.pillar, pillarLabel: this.T.pillarLabels[meta.pillar], subtitle: q.subtitle, text: q.text };
     },
     get currentProfileQ(){
       const meta = this.profileMeta[this.profileIndex];
@@ -933,9 +1006,14 @@ function quizApp(){
       const pillars = ['commute','financial','rights'];
       return pillars.map(key => {
         const qs = this.questionMeta.filter(q => q.pillar === key);
-        const sum = qs.reduce((acc,q) => acc + (this.answers[q.id] || 0), 0);
+        let sum = 0, atRisk = 0;
+        qs.forEach(q => {
+          const raw = this.answers[q.id] || 0;
+          const val = q.invert ? (1 - raw) : raw;
+          sum += val;
+          if(val > 0) atRisk++;
+        });
         const pct = (sum / qs.length) * 100;
-        const atRisk = qs.filter(q => (this.answers[q.id] || 0) > 0).length;
         let level = 'ok';
         if(pct >= 60) level = 'danger';
         else if(pct >= 30) level = 'warn';
@@ -1148,6 +1226,17 @@ function quizApp(){
       this.weakestPillarKey = weakest.key;
       this.animateHeroNumber(Math.round(weakest.pct));
       this.screen = 'result';
+    },
+
+    resetQuiz(){
+      this.screen = 'hook';
+      this.quizIndex = 0;
+      this.profileIndex = 0;
+      this.answers = {};
+      this.profile = {};
+      this.info = { nama:'', whatsapp:'', emel:'', kawasan:'' };
+      this.weakestPillarKey = 'commute';
+      this.heroDisplayPct = 0;
     },
 
     animateHeroNumber(target){
