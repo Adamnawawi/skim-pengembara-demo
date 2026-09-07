@@ -107,6 +107,21 @@
   .field input:focus, .field select:focus{outline:none;border-color:var(--green);}
   .field-hint{font-size:12px;color:var(--ink-soft);margin-top:5px;}
 
+  .combo{position:relative;}
+  .combo-input{
+    width:100%;padding:13px 14px;border:1.5px solid var(--line);border-radius:12px;
+    font-size:16px;font-family:inherit;color:var(--ink);background:#fff;
+  }
+  .combo-input:focus{outline:none;border-color:var(--green);}
+  .combo-list{
+    position:absolute;z-index:20;top:calc(100% + 4px);left:0;right:0;max-height:220px;overflow-y:auto;
+    background:#fff;border:1.5px solid var(--line);border-radius:12px;box-shadow:0 8px 24px rgba(11,47,92,.12);
+  }
+  .combo-item{padding:11px 14px;font-size:15px;color:var(--ink);cursor:pointer;}
+  .combo-item:hover, .combo-item.active{background:#F2F6F4;color:var(--navy);}
+  .combo-empty{padding:11px 14px;font-size:14px;color:var(--ink-soft);}
+  [x-cloak]{display:none!important;}
+
   .q-block{transition:opacity .22s ease, transform .22s ease;}
   .q-block.q-fade{opacity:0;transform:translateY(10px);}
 
@@ -342,14 +357,45 @@
           <div class="field-hint" x-text="T.info.hintEmel"></div>
         </div>
         <div class="field">
+          <label x-text="T.info.labelNegeri"></label>
+          <div class="combo" x-data="{ q:'', open:false }">
+            <input type="text" class="combo-input" autocomplete="off"
+              :value="open ? q : (labelFor(T.info.negeriOptions, info.negeri) || '')"
+              @focus="open=true; q=''"
+              @input="q=$event.target.value; open=true"
+              @blur="setTimeout(() => open=false, 150)"
+              :placeholder="T.info.negeriPlaceholder">
+            <div class="combo-list" x-show="open" x-cloak>
+              <template x-for="opt in filterOptions(T.info.negeriOptions, q)" :key="opt.value">
+                <div class="combo-item" :class="{active: opt.value === info.negeri}"
+                  @mousedown.prevent="selectNegeri(opt.value); open=false" x-text="opt.label"></div>
+              </template>
+              <div class="combo-empty" x-show="filterOptions(T.info.negeriOptions, q).length === 0" x-text="T.info.noResult"></div>
+            </div>
+          </div>
+        </div>
+        <div class="field" x-show="info.negeri === 'Johor'" x-cloak>
           <label x-text="T.info.labelKawasan"></label>
-          <select x-model="info.kawasan">
-            <option value="" disabled selected x-text="T.info.kawasanPlaceholder"></option>
-            <template x-for="opt in T.info.kawasanOptions" :key="opt.value">
-              <option :value="opt.value" x-text="opt.label"></option>
-            </template>
-          </select>
+          <div class="combo" x-data="{ q:'', open:false }">
+            <input type="text" class="combo-input" autocomplete="off"
+              :value="open ? q : (labelFor(T.info.kawasanOptions, info.kawasan) || '')"
+              @focus="open=true; q=''"
+              @input="q=$event.target.value; open=true"
+              @blur="setTimeout(() => open=false, 150)"
+              :placeholder="T.info.kawasanPlaceholder">
+            <div class="combo-list" x-show="open" x-cloak>
+              <template x-for="opt in filterOptions(T.info.kawasanOptions, q)" :key="opt.value">
+                <div class="combo-item" :class="{active: opt.value === info.kawasan}"
+                  @mousedown.prevent="info.kawasan=opt.value; if(opt.value !== 'Lain-lain') info.kawasanLain=''; open=false" x-text="opt.label"></div>
+              </template>
+              <div class="combo-empty" x-show="filterOptions(T.info.kawasanOptions, q).length === 0" x-text="T.info.noResult"></div>
+            </div>
+          </div>
           <div class="field-hint" x-text="T.info.hintKawasan"></div>
+        </div>
+        <div class="field" x-show="info.negeri === 'Johor' && info.kawasan === 'Lain-lain'" x-cloak>
+          <label x-text="T.info.labelKawasanLain"></label>
+          <input type="text" x-model="info.kawasanLain" :placeholder="T.info.placeholderKawasanLain">
         </div>
       </div>
       <div class="nav-row">
@@ -498,6 +544,23 @@ function mergeDeep(base, override){
   return result;
 }
 
+const MALAYSIA_STATES = [
+  'Kuala Lumpur','Selangor','Negeri Sembilan','Melaka','Johor','Perak',
+  'Pulau Pinang','Perlis','Kedah','Pahang','Kelantan','Terengganu','Sabah','Sarawak',
+].map(s => ({ value: s, label: s }));
+
+const JOHOR_CITIES = [
+  'Ayer Baloi','Ayer Hitam','Ayer Tawar','Ayer Tawar 2','Ayer Tawar 3','Ayer Tawar 4',
+  'Bandar Penawar','Bandar Tenggara','Batu Anam','Batu Pahat','Bekok','Benut',
+  'Bukit Gambir','Bukit Pasir','Chaah','Endau','Gelang Patah','Gerisek',
+  'Gugusan Taib Andak','Iskandar Puteri','Jementah','Johor Bahru','Kahang','Kluang',
+  'Kota Tinggi','Kukup','Kulai','Labis','Layang-Layang','Masai','Mersing','Muar',
+  'Nusajaya','Pagoh','Paloh','Panchor','Parit Jawa','Parit Raja','Parit Sulong',
+  'Pasir Gudang','Pekan Nenas','Pengerang','Pontian','Rengam','Rengit','Segamat',
+  'Semerah','Senai','Senggarang','Seri Gading','Seri Medan','Simpang Rengam',
+  'Sungai Mati','Tangkak','Ulu Tiram','Yong Peng','Lain-lain',
+].map(c => ({ value: c, label: c }));
+
 const translations = {
   ms: {
     demoFlag: 'DEMO STATIK — TIADA DATA DIHANTAR ATAU DISIMPAN',
@@ -529,15 +592,15 @@ const translations = {
       labelEmel: 'E-mel (pilihan)',
       placeholderEmel: 'nama@emel.com',
       hintEmel: 'Jika anda pilih terima ringkasan melalui e-mel nanti.',
+      labelNegeri: 'Negeri',
+      negeriPlaceholder: 'Pilih negeri',
+      negeriOptions: MALAYSIA_STATES,
+      noResult: 'Tiada hasil',
       labelKawasan: 'Kawasan Tempat Tinggal di Johor',
       kawasanPlaceholder: 'Pilih kawasan',
-      kawasanOptions: [
-        {value:'JB', label:'Johor Bahru'},
-        {value:'Kulai', label:'Kulai'},
-        {value:'Iskandar Puteri', label:'Iskandar Puteri'},
-        {value:'Pasir Gudang', label:'Pasir Gudang'},
-        {value:'Lain-lain', label:'Lain-lain'},
-      ],
+      kawasanOptions: JOHOR_CITIES,
+      labelKawasanLain: 'Nyatakan kawasan anda',
+      placeholderKawasanLain: 'Nama kawasan/mukim anda',
       hintKawasan: 'Data ini disimulasikan sahaja dalam demo ini — tidak dihantar ke mana-mana pelayan.',
       continueBtn: 'Teruskan',
     },
@@ -657,15 +720,15 @@ const translations = {
       labelEmel: 'Email Address (optional)',
       placeholderEmel: 'name@email.com',
       hintEmel: 'Should you prefer to receive your summary by email.',
+      labelNegeri: 'State',
+      negeriPlaceholder: 'Select a state',
+      negeriOptions: MALAYSIA_STATES,
+      noResult: 'No results',
       labelKawasan: 'Area of Residence in Johor',
       kawasanPlaceholder: 'Select an area',
-      kawasanOptions: [
-        {value:'JB', label:'Johor Bahru'},
-        {value:'Kulai', label:'Kulai'},
-        {value:'Iskandar Puteri', label:'Iskandar Puteri'},
-        {value:'Pasir Gudang', label:'Pasir Gudang'},
-        {value:'Lain-lain', label:'Other'},
-      ],
+      kawasanOptions: JOHOR_CITIES,
+      labelKawasanLain: 'Please specify your area',
+      placeholderKawasanLain: 'Your area/mukim name',
       hintKawasan: 'This data is simulated for the purposes of this demonstration only and is not transmitted to any server.',
       continueBtn: 'Proceed',
     },
@@ -678,6 +741,7 @@ const translations = {
       c1: { subtitle:'Daily Commute', text:'Is your weekly commute across the Causeway/Second Link comfortable and manageable?' },
       c2: { subtitle:'Roadside Emergencies', text:'In the event that your vehicle or means of transport becomes stranded along the border route, do you have access to a reliable network for immediate assistance in Johor?' },
       c3: { subtitle:'Rest and Recovery', text:'Should you require medical leave or time off to undergo medical treatment (for example, several weeks of medical certification), would your monthly income be affected?' },
+      c4: { subtitle:'Commuting Accident Coverage', text:'If an accident occurs while you are travelling to or from work across the border (not while on duty at the office/factory), do you have any insurance coverage for that accident?' },
       f1: { subtitle:'Family Breadwinner', text:"Is the income derived from your labour in Singapore now the primary source of support for your family's expenses (children, spouse, or parents)?" },
       f2: { subtitle:'Malaysia Safety Net', text:'In addition to regular bank savings, do you possess any official fund or welfare scheme in Malaysia that functions as an emergency safeguard?' },
       f3: { subtitle:'Continuity of Livelihood', text:'In the event of an unforeseen accident or injury, do you have access to a support network capable of providing continued physical rehabilitation as well as periodic financial assistance for your family?' },
@@ -784,15 +848,15 @@ const translations = {
       labelEmel: '电子邮件（可选）',
       placeholderEmel: 'name@email.com',
       hintEmel: '如果您选择日后通过电子邮件接收信息',
+      labelNegeri: '州属',
+      negeriPlaceholder: '选择州属',
+      negeriOptions: MALAYSIA_STATES,
+      noResult: '没有结果',
       labelKawasan: '柔佛居住地区',
       kawasanPlaceholder: '选择地区',
-      kawasanOptions: [
-        {value:'JB', label:'新山'},
-        {value:'Kulai', label:'古来'},
-        {value:'Iskandar Puteri', label:'依斯干达公主城'},
-        {value:'Pasir Gudang', label:'巴西古当'},
-        {value:'Lain-lain', label:'其他'},
-      ],
+      kawasanOptions: JOHOR_CITIES,
+      labelKawasanLain: '请注明您的地区',
+      placeholderKawasanLain: '您的地区/村镇名称',
       hintKawasan: '此数据仅为演示模拟——不会发送至任何服务器。',
       continueBtn: '继续',
     },
@@ -805,6 +869,7 @@ const translations = {
       c1: { subtitle:'每日通勤', text:'您每周跨越长堤/第二通道的通勤是否顺畅且可以妥善应对？' },
       c2: { subtitle:'道路紧急事故', text:'如果您的车辆或交通工具在边境路段抛锚，您在柔佛是否有可靠的紧急援助？' },
       c3: { subtitle:'休养与康复', text:'如果您需要请病假或休假接受医疗（例如：请假数周），您的每月收入是否会受到影响？' },
+      c4: { subtitle:'工作旅途中的保障', text:'如果您在跨境往返上下班途中发生意外（而非在办公室/工厂执勤期间），您是否有任何保险保障来应对该意外？' },
       f1: { subtitle:'家庭经济支柱', text:'您在新加坡辛勤工作所得，是否已成为家庭开支（子女、配偶或父母）的主要来源？' },
       f2: { subtitle:'马来西亚安全保障', text:'除了普通银行存款，您在马来西亚是否拥有任何正式的储蓄基金或福利基金，可作为"应急保护伞"？' },
       f3: { subtitle:'生活保障延续性', text:'如果发生意外灾祸或受伤，您是否有支援能够提供持续的身体康复治疗，以及定期为您的家人提供生活津贴？' },
@@ -882,45 +947,45 @@ const translations = {
   },
 
   ta: {
-    demoFlag: 'நிலையான டெமோ — தரவு எதுவும் அனுப்பப்படவில்லை அல்லது சேமிக்கப்படவில்லை',
-    footerNote: 'PERKESO ஜொகூர் · உங்கள் குரல், எங்கள் திட்டம் · உள் டெமோ',
+    demoFlag: 'நிலையான செயல்விளக்கம் — தரவு எதுவும் அனுப்பப்படவோ சேமிக்கப்படவோ இல்லை',
+    footerNote: 'PERKESO ஜொகூர் · உங்கள் குரல், எங்கள் திட்டம் · உள்வட்ட செயல்விளக்கம்',
     profileTag: 'இன்னும் கொஞ்சம்',
     backBtn: 'பின்செல்',
     hook: {
       eyebrow: 'உங்கள் குரல், எங்கள் திட்டம்',
-      headline: 'சிங்கப்பூரில் வேலை. ஆனால்... அவசரநிலை ஏற்பட்டால், யார் பொறுப்பு?',
-      sub: 'ஒவ்வொரு நாளும் நீங்கள் வாழ்வாதாரத்திற்காக காஸ்வேயை கடக்கிறீர்கள். உங்கள் பாதுகாப்பு/சுகாதார பாதுகாப்பில் உள்ள இடைவெளி எங்கே, நாங்கள் எப்படி உதவ முடியும் என்பதை PERKESO அறிய விரும்புகிறது.',
-      cta: '2 நிமிட வினாடி வினாவைத் தொடங்கு',
-      caption: 'PERKESO ஜொகூர் ஈடுபாட்டு அமர்வு · 18 அக்டோபர் 2026',
+      headline: 'நீங்கள் சிங்கப்பூரில் வேலை செய்கிறீர்களா? அப்படியென்றால், உங்களுக்கு அல்லது உங்கள் குடும்பத்தினருக்கு ஏதாவது விபத்து அல்லது அவசர நிலை ஏற்பட்டால், யார் உதவி செய்வார்கள்?',
+      sub: 'தினமும் வேலைக்காக நீங்கள் எல்லையைத் தாண்டி செல்கிறீர்கள். உங்கள் பாதுகாப்பு மற்றும் உடல்நலப் பாதுகாப்பில் என்ன குறைகள் இருக்கின்றன, PERKESO எப்படி உதவ முடியும் என்பதை நாங்கள் தெரிந்துகொள்ள விரும்புகிறோம்.',
+      cta: '2 நிமிடக் கருத்துக்கணிப்பைத் தொடங்குங்கள்',
+      caption: 'சமூகப் பாதுகாப்பு அமைப்பு (PERKESO Johor) கலந்துரையாடல் அமர்வு · 18 அக்டோபர் 2026',
     },
     intro: {
-      heading: 'நாம் தொடங்குவதற்கு முன்',
-      objectiveLabel: 'கணக்கெடுப்பின் நோக்கம்',
-      objectiveText: 'சிங்கப்பூரில் பணிபுரியும் மலேசியர்கள் எதிர்கொள்ளும் உண்மையான பாதுகாப்பு இடைவெளிகளைப் புரிந்துகொள்வதே இந்தச் சிறு கணக்கெடுப்பின் நோக்கமாகும் — இது 18 அக்டோபர் 2026 ஈடுபாட்டு அமர்விற்கு மேலும் துல்லியமான ஆதரவை வடிவமைக்க PERKESO ஜொகூருக்கு உதவும்.',
+      heading: 'தொடங்குவதற்கு முன்',
+      objectiveLabel: 'கருத்துக்கணிப்பின் நோக்கம்',
+      objectiveText: 'சிங்கப்பூரில் வேலை செய்யும் மலேசியத் தொழிலாளர்கள் சந்தித்து பாதுகாப்பு குறைகளைப் புரிந்துகொள்வதற்காக இந்தச் சிறிய கருத்துக்கணிப்பு நடத்தப்படுகிறது. 18 அக்டோபர் 2026 அன்று நடைபெறும் கலந்துரையாடலில் PERKESO Johor சரியான உதவிகளைத் திட்டமிட இது உதவும்.',
       disclaimerLabel: 'பொறுப்புத் துறப்பு',
-      disclaimerText: 'பங்கேற்பு தன்னார்வமானது. உங்கள் பதில்கள் இந்தக் கணக்கெடுப்பு மற்றும் அமர்வு பதிவு / சுருக்கம் அனுப்புதல் ஆகியவற்றுக்கு மட்டுமே பயன்படுத்தப்படும் — வேறு எந்த சந்தைப்படுத்தல் நோக்கமும் இல்லை. அடையாள அட்டை எண் அல்லது நிதி விவரங்கள் போன்ற முக்கியமான தகவல்கள் எதுவும் சேகரிக்கப்படாது.',
+      disclaimerText: 'பங்கேற்பது முற்றிலும் தன்னார்வத் தேர்வாகும். உங்கள் பதில்கள் இந்தக் கருத்துக்கணிப்பு, அமர்வு பதிவு மற்றும் முடிவுச் சுருக்கத்தை அனுப்புதல் ஆகிய நோக்கங்களுக்காக மட்டுமே பயன்படுத்தப்படும் — வேறு எந்த விளம்பர நோக்கத்திற்கும் பயன்படுத்தப்படாது. அடையாள அட்டை எண் அல்லது நிதி விவரங்கள் போன்ற முக்கியமான தனிப்பட்ட தகவல்கள் சேகரிக்கப்படமாட்டாது.',
       continueBtn: 'புரிந்தது, தொடரவும்',
     },
     info: {
-      heading: 'உங்கள் அடிப்படை விவரங்கள் சிலவற்றை மட்டும்',
-      sub: '18 அக்டோபர் அமர்விற்கு உங்களைப் பதிவு செய்யவோ அல்லது வினாடி வினா முடிவுகளின் சுருக்கத்தை அனுப்பவோ இந்தத் தகவலைப் பயன்படுத்துகிறோம். வேறு எந்த சந்தைப்படுத்தல் நோக்கமும் இல்லை.',
-      labelNama: 'பெயர் / செல்லப்பெயர்',
+      heading: 'உங்களைப் பற்றிய சில அடிப்படைத் தகவல்கள் மட்டும்',
+      sub: 'இந்தத் தகவல்கள் 18 அக்டோபர் அமர்வுக்கு உங்களைப் பதிவு செய்ய அல்லது கருத்துக்கணிப்பு முடிவுச் சுருக்கத்தை அனுப்ப மட்டுமே பயன்படுத்தப்படும். வேறு எந்த விளம்பர நோக்கமும் இல்லை.',
+      labelNama: 'பெயர் / புனைபெயர்',
       placeholderNama: 'உங்கள் பெயர்',
-      labelWhatsapp: 'WhatsApp எண்',
-      hintWhatsapp: 'உங்கள் மதிப்பெண் சுருக்கத்தைப் பெற.',
-      labelEmel: 'மின்னஞ்சல் (விருப்பத்தேர்வு)',
+      labelWhatsapp: 'வாட்ஸ்அப் எண்',
+      hintWhatsapp: 'மதிப்பெண் சுருக்கத்தைப் பெறுவதற்காக.',
+      labelEmel: 'மின்னஞ்சல் (விருப்பத் தேர்வு)',
       placeholderEmel: 'name@email.com',
-      hintEmel: 'மின்னஞ்சல் மூலம் சுருக்கத்தைப் பெற விரும்பினால்.',
-      labelKawasan: 'ஜொகூரில் நீங்கள் வசிக்கும் பகுதி',
+      hintEmel: 'முடிவுகளின் சுருக்கத்தை பின்னர் மின்னஞ்சல் மூலம் பெற விரும்பினால்.',
+      labelNegeri: 'மாநிலம்',
+      negeriPlaceholder: 'மாநிலத்தைத் தேர்ந்தெடுக்கவும்',
+      negeriOptions: MALAYSIA_STATES,
+      noResult: 'முடிவுகள் இல்லை',
+      labelKawasan: 'ஜொகூரில் உள்ள உங்கள் குடியிருப்புப் பகுதி',
       kawasanPlaceholder: 'பகுதியைத் தேர்ந்தெடுக்கவும்',
-      kawasanOptions: [
-        {value:'JB', label:'ஜொகூர் பாரு'},
-        {value:'Kulai', label:'குலாய்'},
-        {value:'Iskandar Puteri', label:'இஸ்கந்தர் புத்திரி'},
-        {value:'Pasir Gudang', label:'பசீர் குடாங்'},
-        {value:'Lain-lain', label:'மற்றவை'},
-      ],
-      hintKawasan: 'இந்த டெமோவில் இந்தத் தரவு உருவகப்படுத்தப்பட்டது மட்டுமே — எந்த சர்வருக்கும் அனுப்பப்படாது.',
+      kawasanOptions: JOHOR_CITIES,
+      labelKawasanLain: 'உங்கள் பகுதியைக் குறிப்பிடவும்',
+      placeholderKawasanLain: 'உங்கள் பகுதி/முகிம் பெயர்',
+      hintKawasan: 'இந்தத் தரவு இந்தக் காட்சிப்படுத்தலின் நோக்கத்திற்காக மட்டுமே உருவகப்படுத்தப்பட்டுள்ளது; இது எந்தவொரு சேவையகத்திற்கும் அனுப்பப்படாது.',
       continueBtn: 'தொடரவும்',
     },
     scoreOptions: [
@@ -929,75 +994,76 @@ const translations = {
       { label:'இல்லை', value:1 },
     ],
     questions: {
-      c1: { subtitle:'தினசரி பயணம்', text:'காஸ்வே/இரண்டாம் இணைப்பை வாரந்தோறும் கடப்பது உங்களுக்கு வசதியாகவும் நன்கு நிர்வகிக்கக்கூடியதாகவும் உள்ளதா?' },
-      c2: { subtitle:'சாலை அவசரநிலை', text:'எல்லைப் பாதையில் உங்கள் வாகனம் அல்லது போக்குவரத்து பழுதடைந்தால், ஜொகூரில் நம்பகமான உடனடி உதவி வலையமைப்பு உங்களிடம் உள்ளதா?' },
-      c3: { subtitle:'ஓய்வும் மீட்சியும்', text:'நீங்கள் மருத்துவ விடுப்பு எடுக்க வேண்டியிருந்தால் (எ.கா. சில வாரங்கள் MC), உங்கள் மாத வருமானம் பாதிக்கப்படுமா?' },
-      f1: { subtitle:'முதன்மை உழைப்பாளி', text:'சிங்கப்பூரில் நீங்கள் சம்பாதிக்கும் வருமானம் இப்போது உங்கள் குடும்பச் செலவுகளுக்கு (பிள்ளைகள், துணைவர், பெற்றோர்) முதன்மை ஆதாரமாக உள்ளதா?' },
-      f2: { subtitle:'மலேசிய பாதுகாப்பு வலையமைப்பு', text:'வழக்கமான வங்கி சேமிப்புக்கு கூடுதலாக, "அவசரகால குடை" போல செயல்படும் அதிகாரப்பூர்வ நல நிதி மலேசியாவில் உங்களிடம் உள்ளதா?' },
-      f3: { subtitle:'வாழ்வாதார தொடர்ச்சி', text:'எதிர்பாராத விபத்து அல்லது காயம் ஏற்பட்டால், தொடர்ச்சியான உடல் மீட்சி சிகிச்சையையும் உங்கள் குடும்பத்திற்கு அவ்வப்போது வாழ்வாதார உதவியையும் வழங்கக்கூடிய அதிகாரப்பூர்வ ஆதரவு வலையமைப்பு உங்களிடம் உள்ளதா?' },
-      r1: { subtitle:'நியாயமான இழப்பீடு', text:'பணியின் போது ஏதேனும் சிக்கல் ஏற்பட்டால், நீங்கள் பெற வேண்டிய நல உரிமைகள் மற்றும் இழப்பீடு பற்றி உங்களுக்குத் தெரியுமா?' },
-      r2: { subtitle:'வசதிகள்', text:'எல்லை கடந்து பணிபுரியும் தொழிலாளர்களுக்கு எளிதில் அணுகக்கூடிய ஆதரவு அல்லது சிகிச்சை மையத்தை மலேசியா வழங்கினால், நீங்கள் ஆர்வமாக இருப்பீர்களா?' },
-      r3: { subtitle:'துறையின் எதிர்காலம்', text:'சிங்கப்பூரில் பணிபுரியும் மலேசிய தொழிலாளர்களுக்கு அரசு அங்கீகரித்த, சர்வதேச தரத்திலான அதிகாரப்பூர்வ நல திட்டம் இருக்க வேண்டும் என்று நீங்கள் ஒப்புக்கொள்கிறீர்களா?' },
-      r4: { subtitle:'குரல் கொடுக்கும் வாய்ப்பு', text:'உங்களைப் போன்ற தொழிலாளர்களுக்கான உதவிக் கொள்கைகளை வடிவமைக்கும்போது, உங்கள் உண்மையான கருத்துகளும் அனுபவங்களும் கருத்தில் கொள்ளப்பட வேண்டும் என்று விரும்புகிறீர்களா?' },
+      c1: { subtitle:'தினசரி பயணம்', text:'காஸ்வே அல்லது செகண்ட் லிங்க் வழியாக நீங்கள் வாரந்தோறும் மேற்கொள்ளும் பயணம் வசதியாகவும் சமாளிக்கக்கூடியதாகவும் உள்ளதா?' },
+      c2: { subtitle:'சாலையோர அவசரநிலை', text:'எல்லைப் பாதையில் உங்கள் வாகனம் அல்லது போக்குவரத்து வசதி பழுதடைந்தால், ஜொகூரில் உடனடி உதவி பெற நம்பகமான ஆதரவு வலையமைப்பு உங்களிடம் உள்ளதா?' },
+      c3: { subtitle:'ஓய்வு & மீட்பு', text:'நோய் அல்லது சிகிச்சைக்காக சில காலங்கள் மருத்துவ விடுப்பில் (MC) இருக்க வேண்டியிருந்தால், உங்கள் மாத வருமானம் பாதிக்கப்படுமா?' },
+      c4: { subtitle:'பணிப் பயணப் பாதுகாப்பு', text:'எல்லை தாண்டி வேலைக்குச் செல்லும்போதோ அல்லது அங்கிருந்து திரும்பும்போதோ (அலுவலகம் அல்லது தொழிற்சாலையில் பணியில் இருக்கும்போது அல்லாமல்) ஏதேனும் விபத்து ஏற்பட்டால், அத்தகைய விபத்துக்கான காப்பீட்டுப் பாதுகாப்பு உங்களுக்கு உள்ளதா?' },
+      f1: { subtitle:'குடும்ப வாழ்வாதாரத்தின் ஆதாரம்', text:'சிங்கப்பூரில் நீங்கள் உழைத்து சம்பாதிக்கும் வருமானம் தற்போது உங்கள் குடும்பச் செலவுகளுக்கு (பிள்ளைகள், துணைவர் அல்லது பெற்றோர்) முக்கிய ஆதாரமாக உள்ளதா?' },
+      f2: { subtitle:'மலேசியப் பாதுகாப்பு வலையமைப்பு', text:'வங்கி சேமிப்பைத் தவிர, அவசர நேரத்தில் உதவும் ஏதாவது நிதி அல்லது நலத்திட்டம் உங்களிடம் இருக்கிறதா?' },
+      f3: { subtitle:'வாழ்வாதாரத் தொடர்ச்சி', text:'எதிர்பாராத விபத்து அல்லது காயம் ஏற்பட்டால், தொடர்ந்து சிகிச்சைக்கும் உங்கள் குடும்பச் செலவுகளுக்கும் உதவி செய்ய யாராவது இருக்கிறார்களா?' },
+      r1: { subtitle:'நியாயமான இழப்பீடு', text:'பணியில் இருக்கும்போது ஏதேனும் சிரமம் ஏற்பட்டால், நீங்கள் பெற வேண்டிய நலன்கள் மற்றும் இழப்பீட்டு உரிமைகள் என்ன என்பதை அறிந்திருக்கிறீர்களா?' },
+      r2: { subtitle:'வசதிகள்', text:'எல்லை தாண்டிச் செல்லும் தொழிலாளர்களுக்காக மலேசியா எளிதில் அணுகக்கூடிய ஆதரவு அல்லது சிறப்பு சிகிச்சை மையங்களை வழங்கினால், நீங்கள் விரும்புவீர்களா?' },
+      r3: { subtitle:'துறையின் எதிர்காலம்', text:'சிங்கப்பூரில் வேலை செய்யும் மலேசியத் தொழிலாளர்களுக்கு, மலேசிய அரசாங்கம் அங்கீகரிக்கும் ஒரு நலத்திட்டம் இருக்க வேண்டும் என்று நினைக்கிறீர்களா?' },
+      r4: { subtitle:'உங்கள் கருத்தைத் தெரிவிக்க வாய்ப்பு', text:'உங்களைப் போன்ற தொழிலாளர்களுக்கான ஆதரவுக் கொள்கைகளை உருவாக்கும்போது, உங்கள் உண்மையான கருத்துகளும் அனுபவங்களும் கருத்தில் கொள்ளப்பட வேண்டும் என்று விரும்புகிறீர்களா?' },
     },
     profileQuestions: {
-      tempoh: { text:'நீங்கள் சிங்கப்பூரில் எவ்வளவு காலமாக பணிபுரிகிறீர்கள்?', options:{
-        '<1':'1 வருடத்திற்கும் குறைவாக (இன்னும் பழகி வருகிறேன்)', '1-5':'1–5 ஆண்டுகள் (நிலையானது)', '>5':'5 ஆண்டுகளுக்கு மேல் (அதிக அனுபவம்)' } },
-      moda: { text:'உங்கள் முதன்மை பயண முறை:', options:{
-        motosikal:'மோட்டார் சைக்கிள்', bas:'பொது பேருந்து / தொழிற்சாலை பேருந்து', kereta:'சொந்த கார் / வாடகை கார்', jalan_rts:'நடைபயணம் / ரயில் (RTS/KTM)' } },
-      impian: { text:'அடுத்த 3 ஆண்டுகளில் உங்கள் மிகப்பெரிய கனவு/முன்னுரிமை என்ன?', options:{
-        aset_rumah:'ஜொகூரில் அமைதியாக சொத்து/வீடு கட்டுவது', pendidikan_anak:'பிள்ளைகளின் கல்வி எதிர்காலத்தை உறுதி செய்வது',
-        modal_perniagaan:'சொந்த நாட்டில் வணிகம் தொடங்க மூலதனம் சேர்ப்பது', jaminan_kebajikan:'மலேசியாவில் உள்ள தொழிலாளர்களுக்கு இணையான நல உத்தரவாதம் பெறுவது' } },
-      topik: { text:'அதிகாரிகளுடன் விவாதிக்க மிகவும் பயனுள்ள தலைப்பு எது?', options:{
-        rawatan_perubatan:'ஜொகூரில் மருத்துவ சிகிச்சை வசதிகள் & பேனல் கிளினிக்குகள்', bantuan_kewangan:'வருமான இழப்பிற்கான அவசர நிதி உதவித் திட்டம்',
-        persaraan_simpanan:'ஓய்வூதிய திட்டங்களும் எதிர்கால சேமிப்பும்', pasport_permit:'பாஸ்போர்ட், அனுமதி, மற்றும் எல்லை கடத்தல் தொடர்பான பிரச்சினைகள்' } },
-      hadir: { text:'சிறப்பு ஈடுபாட்டு அமர்வுக்கான வருகை விருப்பம் (ஞாயிறு, 18 அக்டோபர் 2026):', options:{
-        pagi:'காலை அமர்வில் கலந்துகொள்ளுங்கள் (காலை 9.00 – மதியம் 1.00) — இலவச நுழைவு, காலை உணவு, மதிய உணவு & நினைவுப் பரிசு வழங்கப்படும்',
-        jauh:'நேரில் வர முடியாது, ஆனால் WhatsApp/மின்னஞ்சல் மூலம் சுருக்கத்தைப் பெற விரும்புகிறேன்' } },
+      tempoh: { text:'நீங்கள் சிங்கப்பூரில் எத்தனை வருடங்களாக வேலை செய்கிறீர்கள்?', options:{
+        '<1':'1 ஆண்டிற்கும் குறைவு (இன்னும் பழகிக்கொண்டிருக்கிறேன்)', '1-5':'1 – 5 ஆண்டுகள் (நிலையான நிலை)', '>5':'5 ஆண்டுகளுக்கு மேல் (விரிவான அனுபவம்)' } },
+      moda: { text:'உங்கள் முக்கியப் பயண முறை:', options:{
+        motosikal:'மோட்டார் சைக்கிள்', bas:'பொது பேருந்து / தொழிற்சாலை பேருந்து', kereta:'சொந்த கார் / வாடகைக் கார்', jalan_rts:'நடந்து செல்வது / ரயில் (RTS/KTM)' } },
+      impian: { text:'அடுத்த 3 வருடங்களில் உங்களுடைய பெரிய கனவு அல்லது முக்கிய இலக்கு என்ன?', options:{
+        aset_rumah:'ஜொகூரில் நிம்மதியாக சொத்து/வீடு உருவாக்குவது', pendidikan_anak:'பிள்ளைகளின் கல்வி எதிர்காலத்தை உறுதிப்படுத்துவது',
+        modal_perniagaan:'தாய்நாட்டில் தொழில் தொடங்க முதலீட்டுத் தொகையைச் சேமிப்பது', jaminan_kebajikan:'மலேசியாவில் பணிபுரியும் தொழிலாளர்களுக்கு இணையான நலப் பாதுகாப்பைப் பெறுவது' } },
+      topik: { text:'அதிகாரிகளுடன் கலந்துரையாடுவதற்கு உங்களுக்கு மிகவும் பயனுள்ளதாக இருக்கும் தலைப்பு எது?', options:{
+        rawatan_perubatan:'ஜொகூரில் மருத்துவ சிகிச்சை வசதிகள் & பேனல் கிளினிக்குகள்', bantuan_kewangan:'வருமான ஆதாரம் இழந்தால் அவசர நிதியுதவித் திட்டம்',
+        persaraan_simpanan:'ஓய்வூதியத் திட்டம் மற்றும் எதிர்கால சேமிப்பு', pasport_permit:'கடவுச்சீட்டு, அனுமதிப்பத்திரம் மற்றும் எல்லை கடக்கும் நடைமுறை தொடர்பான சிக்கல்கள்' } },
+      hadir: { text:'சிறப்பு கலந்துரையாடல் நிகழ்ச்சியில் கலந்துகொள்ளும் விருப்பம் (ஞாயிற்றுக்கிழமை, 18 அக்டோபர் 2026):', options:{
+        pagi:'காலை அமர்வில் கலந்துகொள்வேன் (காலை 9.00 – பிற்பகல் 1.00) — இலவச நுழைவு, காலை உணவு, மதிய உணவு & நினைவுப்பரிசு வழங்கப்படும்',
+        jauh:'நேரில் கலந்துகொள்ள முடியாது; ஆனால் WhatsApp/மின்னஞ்சல் மூலம் சுருக்கத்தைப் பெற விரும்புகிறேன்' } },
     },
     pillarLabels: {
-      commute: 'பயண வழக்கமும் நல்வாழ்வும்',
-      financial: 'சொந்த நாட்டில் சேமிப்பு மற்றும் குடும்ப நிலைத்தன்மை',
-      rights: 'வெளிநாட்டு தொழிலாளர் உரிமைகளும் குரலும்',
+      commute: 'பயண வழக்கம் & நலவாழ்வு',
+      financial: 'சொந்த ஊரில் உள்ள குடும்பங்களுக்கான சேமிப்பு நிலைத்தன்மை',
+      rights: 'வெளிநாட்டுப் பணியாளர்களின் உரிமைகள் & குரல்',
     },
     pillarShortLabels: { commute:'பயணம்', financial:'குடும்ப நிதி', rights:'தொழிலாளர் உரிமைகள்' },
     pillarMessages: {
-      commute: 'காஸ்வே/இரண்டாம் இணைப்பு வழியான உங்கள் தினசரி பயணத்தில், சாலை அவசரநிலைகள் முதல் மருத்துவ விடுப்பு காலத்தில் வருமான அழுத்தம் வரை முழுமையாக சமாளிக்கப்படாத அபாயங்கள் இருப்பதாகத் தெரிகிறது.',
-      financial: 'விபத்து அல்லது திடீர் வருமான இழப்பு ஏற்பட்டால், சொந்த நாட்டில் உங்கள் சேமிப்பு நிலைத்தன்மையும் குடும்ப பாதுகாப்பு வலையமைப்பும் போதுமானதாக இல்லாமல் இருக்கலாம்.',
-      rights: 'உங்கள் நல உரிமைகள் மற்றும் இழப்பீடு பற்றி உங்களுக்கு உறுதியாகத் தெரியாமல் இருக்கலாம், அல்லது எல்லை கடந்த தொழிலாளர் ஆதரவுக் கொள்கைகளில் உங்கள் குரல் கருத்தில் கொள்ளப்படவில்லை என்று நீங்கள் உணரலாம்.',
+      commute: 'காஸ்வே அல்லது செகண்ட் லிங்க் வழியாக நீங்கள் வழக்கமாக மேற்கொள்ளும் பயணமானது, சாலையோர அவசரநிலைகள் முதல் மருத்துவ விடுப்பின் போது ஏற்படும் நிதிச் சுமை வரை, முழுமையாகக் கவனிக்கப்படாத அபாயங்களைக் கொண்டிருப்பதாகத் தெரிகிறது.',
+      financial: 'திடீர் துயரச் சம்பவம் அல்லது வருமான இழப்பு ஏற்பட்டால், உங்கள் சேமிப்பு நிலைத்தன்மையும் தாய்நாட்டில் உள்ள குடும்பத்தின் பாதுகாப்பு வலையமைப்பும் போதுமானதாக இல்லாமல் இருக்கக்கூடும்.',
+      rights: 'உங்கள் நலன் மற்றும் இழப்பீட்டு உரிமைகள் குறித்து இன்னும் தெளிவாகத் தெரியாமல் இருக்கலாம்; அல்லது எல்லை தாண்டிச் செல்லும் தொழிலாளர்களுக்கான ஆதரவுக் கொள்கைகளில் உங்கள் குரல் இன்னும் கருத்தில் கொள்ளப்படவில்லை என்று நீங்கள் உணரலாம்.',
     },
     pillarConsequences: {
-      commute: 'நாளை எல்லையில் அவசரநிலை ஏற்பட்டால், நீங்கள் தனியாக அதைச் சமாளிக்க வேண்டியிருக்கலாம்.',
-      financial: 'சிங்கப்பூர் வருமானம் ஒரு மாதம் நின்றாலும், மலேசியாவில் உள்ள உங்கள் குடும்பமும் பாதிக்கப்படும்.',
-      rights: 'உங்கள் உண்மையான உரிமைகளை கோர காலம் கடந்துவிடும் வரை, அவற்றை நீங்கள் அறியாமல் இருக்கலாம்.',
+      commute: 'நாளை எல்லையில் அவசரநிலை ஏற்பட்டால், அதைச் சமாளிக்க நீங்கள் தனியாக இருக்க நேரிடலாம்.',
+      financial: 'சிங்கப்பூர் வருமானம் ஒரு மாதத்திற்கு நிறுத்தப்பட்டால்கூட, மலேசியாவில் உள்ள உங்கள் குடும்பமும் பாதிக்கப்படும்.',
+      rights: 'உங்கள் உண்மையான உரிமைகள் என்ன என்பதை அறியும் நேரத்தில், அவற்றைக் கோருவதற்கு தாமதமாகிவிடக்கூடும்.',
     },
     topikLabels: {
       rawatan_perubatan: 'ஜொகூரில் மருத்துவ சிகிச்சை வசதிகள் & பேனல் கிளினிக்குகள்',
-      bantuan_kewangan: 'வருமான இழப்பிற்கான அவசர நிதி உதவித் திட்டம்',
-      persaraan_simpanan: 'ஓய்வூதிய திட்டங்களும் எதிர்கால சேமிப்பும்',
-      pasport_permit: 'பாஸ்போர்ட், அனுமதி, மற்றும் எல்லை கடத்தல் தொடர்பான பிரச்சினைகள்',
+      bantuan_kewangan: 'வருமான ஆதாரம் இழந்தால் அவசர நிதியுதவித் திட்டம்',
+      persaraan_simpanan: 'ஓய்வூதியத் திட்டம் மற்றும் எதிர்கால சேமிப்பு',
+      pasport_permit: 'கடவுச்சீட்டு, அனுமதிப்பத்திரம் மற்றும் எல்லை கடக்கும் நடைமுறை தொடர்பான சிக்கல்கள்',
     },
     result: {
       eyebrow: 'உங்கள் முடிவு',
       defaultName: 'நண்பரே',
-      headingSuffix: '{name}, இது உங்கள் பாதுகாப்பு இடைவெளி',
-      heroFraction: '{total} கேள்விகளில் {atRisk} இங்கு ஒரு இடைவெளியைக் காட்டுகின்றன',
-      breakdownLabel: 'தூணின்படி பிரிவு',
+      headingSuffix: '{name}, இதோ உங்கள் பாதுகாப்பில் உள்ள இடைவெளிகள்',
+      heroFraction: 'மொத்தம் {total} கேள்விகளில் {atRisk} இங்கு பாதுகாப்பு இடைவெளி இருப்பதைக் காட்டுகின்றன',
+      breakdownLabel: 'தூண் வாரியான விவரம்',
       pctTemplate: '{pct}% இடைவெளி',
-      topikTieIn: 'இது நீங்கள் முன்னர் தேர்ந்தெடுத்த தலைப்புடன் — {topik} — ஒத்துப்போகிறது — இது 18 அக்டோபர் அமர்வின் முக்கிய கவனங்களில் ஒன்றாக இருக்கும்.',
-      ctaAttend: '{topic} பற்றிய பதில்களைப் பெறுங்கள் — 18 அக்டோபர் பதிவு செய்யவும்',
-      ctaRemote: 'எனது {topic} சுருக்கத்தை WhatsApp/மின்னஞ்சலுக்கு அனுப்பவும்',
-      reassurance: 'இலவசம் · காலை அமர்விற்கு காலை & மதிய உணவு வழங்கப்படும்',
+      topikTieIn: 'இது நீங்கள் முன்பு தேர்ந்தெடுத்த {topik} என்ற தலைப்புடன் தொடர்புடையது — அது 18 அக்டோபர் நடைபெறும் அமர்வின் முக்கிய கவனப்பகுதிகளில் ஒன்றாக இருக்கும்.',
+      ctaAttend: '{topic} குறித்து பதில்களைப் பெறுங்கள் — 18 அக்டோபர் பதிவு',
+      ctaRemote: '{topic} பற்றிய சுருக்கத்தை எனது வாட்ஸ்அப் அல்லது மின்னஞ்சலுக்கு அனுப்பவும்.',
+      reassurance: 'இலவசம் · காலை அமர்வுக்கு காலை உணவு & மதிய உணவு வழங்கப்படும்',
     },
     confirm: {
-      headingPagi: 'உங்கள் பதிவு உறுதி செய்யப்பட்டது!',
-      headingJauh: 'சுருக்கம் தயாரிக்கப்பட்டு வருகிறது!',
-      bodyPagi: 'நன்றி, {nama}. 18 அக்டோபர் 2026 ஜொகூரில் நடைபெறும் காலை அமர்விற்கான (காலை 9.00 – மதியம் 1.00) உங்கள் இடம் பதிவு செய்யப்பட்டுள்ளது — இலவச நுழைவு, காலை உணவு, மதிய உணவு & நினைவுப் பரிசு வழங்கப்படும். மேலும் விவரங்களுக்கு நாங்கள் WhatsApp மூலம் உங்களைத் தொடர்பு கொள்வோம்.',
-      bodyJauh: 'நன்றி, {nama}. வினாடி வினா சுருக்கமும் திட்ட தகவலும் விரைவில் உங்கள் WhatsApp/மின்னஞ்சலுக்கு அனுப்பப்படும்.',
+      headingPagi: 'உங்கள் பதிவு ஏற்றுக்கொள்ளப்பட்டது!',
+      headingJauh: 'சுருக்கம் தயாராகிக் கொண்டிருக்கிறது!',
+      bodyPagi: 'நன்றி, {nama}. ஜொகூரில் 2026 அக்டோபர் 18 அன்று நடைபெறும் காலை அமர்வுக்கான (காலை 9:00 மணி முதல் மதியம் 1:00 மணி வரை) உங்கள் முன்பதிவு உறுதி செய்யப்பட்டது. இதில் பங்கேற்கக் கட்டணம் ஏதுமில்லை; காலை உணவு, மதிய உணவு மற்றும் நினைவுப் பரிசு ஆகியவை வழங்கப்படும். கூடுதல் விவரங்களுக்கு நாங்கள் உங்களை வாட்ஸ்அப் மூலம் தொடர்புகொள்வோம்.',
+      bodyJauh: 'நன்றி, {nama}. கருத்துக்கணிப்பு முடிவுச் சுருக்கமும் திட்டம் தொடர்பான தகவல்களும் விரைவில் உங்கள் வாட்ஸ்அப்/மின்னஞ்சலுக்கு அனுப்பப்படும்.',
       backLink: '← எனது முடிவை மீண்டும் பார்க்கவும்',
-      thanks: 'இந்த கணக்கெடுப்பை நிறைவு செய்ய நேரம் ஒதுக்கியதற்கு நன்றி!',
+      thanks: 'இந்தக் கருத்துக்கணிப்புக்கு பதிலளிக்க உங்கள் நேரத்தை ஒதுக்கியதற்கு நன்றி!',
       restartBtn: 'மீண்டும் நிரப்பவும்',
-      demoNote: '(டெமோ — உண்மையான செய்தி எதுவும் அனுப்பப்படவில்லை)',
+      demoNote: '(செயல்விளக்கம் — உண்மையான செய்தி எதுவும் அனுப்பப்படாது)',
     },
     bridge: { johor:'ஜொகூர்', singapura:'சிங்கப்பூர்', step:'படி {step} / {total}' },
     answersReview: {
@@ -1023,7 +1089,7 @@ function quizApp(){
       {code:'ta', label:'தமிழ்'},
     ],
 
-    info: { nama:'', whatsapp:'', emel:'', kawasan:'' },
+    info: { nama:'', whatsapp:'', emel:'', negeri:'', kawasan:'', kawasanLain:'' },
     quizIndex: 0,
     profileIndex: 0,
     answers: {},
@@ -1060,7 +1126,30 @@ function quizApp(){
     },
 
     get totalSteps(){ return 1 + this.questionMeta.length + this.profileMeta.length; },
-    get infoValid(){ return this.info.nama.trim().length > 0 && this.info.whatsapp.trim().length > 0 && this.info.kawasan.trim().length > 0; },
+    get infoValid(){
+      const johorSelected = this.info.negeri === 'Johor';
+      const kawasanOk = !johorSelected
+        || (this.info.kawasan.trim().length > 0
+          && (this.info.kawasan !== 'Lain-lain' || this.info.kawasanLain.trim().length > 0));
+      return this.info.nama.trim().length > 0
+        && this.info.whatsapp.trim().length > 0
+        && this.info.negeri.trim().length > 0
+        && kawasanOk;
+    },
+
+    filterOptions(list, q){
+      const needle = (q || '').trim().toLowerCase();
+      if(!needle) return list;
+      return list.filter(opt => opt.label.toLowerCase().includes(needle));
+    },
+    labelFor(list, value){
+      const found = list.find(opt => opt.value === value);
+      return found ? found.label : '';
+    },
+    selectNegeri(value){
+      this.info.negeri = value;
+      if(value !== 'Johor'){ this.info.kawasan = ''; this.info.kawasanLain = ''; }
+    },
 
     get currentQuestion(){
       const meta = this.questionMeta[this.quizIndex];
@@ -1321,7 +1410,7 @@ function quizApp(){
       this.profileIndex = 0;
       this.answers = {};
       this.profile = {};
-      this.info = { nama:'', whatsapp:'', emel:'', kawasan:'' };
+      this.info = { nama:'', whatsapp:'', emel:'', negeri:'', kawasan:'', kawasanLain:'' };
       this.weakestPillarKey = 'commute';
       this.heroDisplayPct = 0;
     },
