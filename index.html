@@ -487,6 +487,17 @@
 
 <script src="https://cdn.jsdelivr.net/npm/alpinejs@3.14.1/dist/cdn.min.js" defer></script>
 <script>
+function mergeDeep(base, override){
+  const result = { ...base };
+  for(const key in override){
+    const b = base ? base[key] : undefined;
+    const o = override[key];
+    const bothPlainObjects = o && typeof o === 'object' && !Array.isArray(o) && b && typeof b === 'object' && !Array.isArray(b);
+    result[key] = bothPlainObjects ? mergeDeep(b, o) : o;
+  }
+  return result;
+}
+
 const translations = {
   ms: {
     demoFlag: 'DEMO STATIK — TIADA DATA DIHANTAR ATAU DISIMPAN',
@@ -539,6 +550,7 @@ const translations = {
       c1: { subtitle:'Perjalanan Harian', text:'Adakah perjalanan mingguan anda merentas Tambak/Linkedua selesa dan boleh diuruskan dengan baik?' },
       c2: { subtitle:'Kecemasan Jalan Raya', text:'Jika kenderaan atau pengangkutan anda terkandas di laluan sempadan, adakah anda mempunyai jaringan bantuan segera yang boleh dipercayai di Johor?' },
       c3: { subtitle:'Rehat & Pemulihan', text:'Jika anda memerlukan cuti sakit atau cuti bagi menjalani rawatan perubatan (contoh: MC beberapa minggu), adakah pendapatan bulanan anda akan terjejas?' },
+      c4: { subtitle:'Perlindungan Semasa Perjalanan Kerja', text:'Jika berlaku kemalangan semasa anda pergi atau balik kerja merentasi sempadan (bukan semasa bertugas di pejabat/kilang), adakah anda mempunyai sebarang perlindungan insurans untuk kemalangan tersebut?' },
       f1: { subtitle:'Penyambung Nafkah', text:'Adakah hasil titik peluh anda di Singapura kini menjadi tunjang utama untuk perbelanjaan keluarga (anak, pasangan, atau ibu bapa)?' },
       f2: { subtitle:'Jaringan Keselamatan Malaysia', text:'Selain simpanan bank biasa, adakah anda mempunyai sebarang tabung atau dana kebajikan rasmi di Malaysia yang bertindak sebagai "payung kecemasan"?' },
       f3: { subtitle:'Kesinambungan Sara Hidup', text:'Sekiranya berlaku musibah atau kecederaan di luar jangka, adakah anda mempunyai jaringan sokongan yang mampu menyediakan rawatan pemulihan fizikal berterusan serta bantuan sara hidup berkala untuk keluarga anda?' },
@@ -1018,7 +1030,7 @@ function quizApp(){
     profile: {},
 
     questionMeta: [
-      { id:'c1', pillar:'commute' }, { id:'c2', pillar:'commute' }, { id:'c3', pillar:'commute', invert:true },
+      { id:'c1', pillar:'commute' }, { id:'c2', pillar:'commute' }, { id:'c3', pillar:'commute', invert:true }, { id:'c4', pillar:'commute' },
       { id:'f1', pillar:'financial' }, { id:'f2', pillar:'financial' }, { id:'f3', pillar:'financial' },
       { id:'r1', pillar:'rights' }, { id:'r2', pillar:'rights' }, { id:'r3', pillar:'rights' }, { id:'r4', pillar:'rights' },
     ],
@@ -1041,7 +1053,7 @@ function quizApp(){
       this.$watch('lang', (v) => { document.documentElement.lang = v; });
     },
 
-    get T(){ return { ...translations.ms, ...(translations[this.lang] || {}) }; },
+    get T(){ return mergeDeep(translations.ms, translations[this.lang] || {}); },
 
     fmt(str, vars){
       return str.replace(/\{(\w+)\}/g, (m, k) => (vars[k] !== undefined ? vars[k] : m));
